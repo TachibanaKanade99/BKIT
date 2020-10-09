@@ -93,7 +93,23 @@ SEMI: ';';
 
 // Literals:
 
+// Integer Literal:
+fragment DIGIT: [0-9];
+fragment INT: [1-9] DIGIT* | '0';
+fragment HEXA_DEC: '0'[Xx] [0-9A-F]+;
+fragment OCTAL: '0'[Oo] [0-7]+;
+INT_LIT: INT | HEXA_DEC | OCTAL;
 
+// Float Literal:
+fragment DECIMAL_PART: '.' DIGIT*;
+fragment EXPONENT_PART: [Ee] [+-]? DIGIT+;
+FLOAT_LIT: (INT DECIMAL_PART? EXPONENT_PART) | (INT DECIMAL_PART EXPONENT_PART?);  
+
+// Boolean Literal:
+BOOL_LIT: TRUE | FALSE;
+
+// String Literals:
+STRING_LIT: '"' . | '\\' [bfrnt\'\] '"';
 
 // Identifiers:
 ID: [a-z][a-zA-Z_0-9]*;

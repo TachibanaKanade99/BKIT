@@ -26,7 +26,7 @@ class LexerSuite(unittest.TestCase):
         self.assertTrue(TestLexer.checkLexeme("ABCabc", "Error Token A", 107))
 
     def test_id_with_number(self):
-        self.assertTrue(TestLexer.checkLexeme("123abc", "Error Token 1", 108))
+        self.assertTrue(TestLexer.checkLexeme("123 abc", "123,abc,<EOF>", 108))
 
     def test_id_with_underscore(self):
         self.assertTrue(TestLexer.checkLexeme("_abc", "Error Token _", 109))
@@ -135,7 +135,39 @@ class LexerSuite(unittest.TestCase):
         self.assertTrue(TestLexer.checkLexeme("**:aBc", "*,*,:,aBc,<EOF>", 138))
     
     def test_semi_operator(self):
-        self.assertTrue(TestLexer.checkLexeme("**;aBc", "*,*,;,aBc,<EOF>", 138))
+        self.assertTrue(TestLexer.checkLexeme("**;aBc", "*,*,;,aBc,<EOF>", 139))
+
+    # Test Integer Literals:
+
+    def test_int_lit(self):
+        self.assertTrue(TestLexer.checkLexeme("0", "0,<EOF>", 140))
+
+    def test_large_int_lit(self):
+        self.assertTrue(TestLexer.checkLexeme("199", "199,<EOF>", 141))
+
+    def test_hexadecimal_1(self):
+        self.assertTrue(TestLexer.checkLexeme("0xFF", "0xFF,<EOF>", 142))
+
+    def test_hexadecimal_2(self):
+        self.assertTrue(TestLexer.checkLexeme("0XABC", "0XABC,<EOF>", 143))
+
+    def test_octal_1(self):
+        self.assertTrue(TestLexer.checkLexeme("0o567", "0o567,<EOF>", 144))
+
+    def test_octal_2(self):
+        self.assertTrue(TestLexer.checkLexeme("0199", "0,199,<EOF>", 145))
+
+    # Test Float Literals:
+    def test_float_lit(self):
+        self.assertTrue(TestLexer.checkLexeme("12000e-1", "12000e-1,<EOF>", 146))
+
+    # Test String Literals:
+    def test_string_lit(self):
+        self.assertTrue(TestLexer.checkLexeme(""" "abc" """, """ "abc",<EOF> """, 147))
+
+    # def test_normal_string_with_escape(self):
+    #     """test normal string with escape"""
+    #     self.assertTrue(TestLexer.checkLexeme(""" "ab'"c\\n def"  ""","""ab'"c\\n def,<EOF>""",148))
 
     # def test_illegal_escape(self):
     #     """test illegal escape"""
@@ -145,7 +177,4 @@ class LexerSuite(unittest.TestCase):
     #     """test unclosed string"""
     #     self.assertTrue(TestLexer.checkLexeme(""" "abc def  ""","""Unclosed String: abc def  """,106))
 
-    # def test_normal_string_with_escape(self):
-    #     """test normal string with escape"""
-    #     self.assertTrue(TestLexer.checkLexeme(""" "ab'"c\\n def"  ""","""ab'"c\\n def,<EOF>""",107))
 
