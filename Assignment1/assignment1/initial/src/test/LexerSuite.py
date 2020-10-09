@@ -52,6 +52,91 @@ class LexerSuite(unittest.TestCase):
             "<EOF>",
         114))
 
+    # Test keywords:
+
+    def test_body_keyword(self):
+        self.assertTrue(TestLexer.checkLexeme("Bodyabc", "Body,abc,<EOF>", 115))
+
+    def test_body_break_keyword(self):
+        self.assertTrue(TestLexer.checkLexeme("abcBody Break","abcBody,Break,<EOF>", 116))
+
+    def test_if_keyword_with_id(self):
+        self.assertTrue(TestLexer.checkLexeme("If abc", "If,abc,<EOF>", 117))
+
+    def test_keyword_with_wrong_id(self):
+        self.assertTrue(TestLexer.checkLexeme("Var a ABC", "Var,a,Error Token A", 118))
+
+    # Test operators:
+
+    def test_div_operator(self):
+        self.assertTrue(TestLexer.checkLexeme("a \ b", "a,\,b,<EOF>", 119))
+    
+    def test_plus_operator(self):
+        self.assertTrue(TestLexer.checkLexeme("a + b", "a,+,b,<EOF>", 120))
+
+    def test_float_plus_operator(self):
+        self.assertTrue(TestLexer.checkLexeme("a +. b", "a,+.,b,<EOF>", 121))
+
+    def test_mod_operator(self):
+        self.assertTrue(TestLexer.checkLexeme("a % b", "a,%,b,<EOF>", 122))
+
+    def test_not_operator(self):
+        self.assertTrue(TestLexer.checkLexeme("If!aBc", "If,!,aBc,<EOF>", 123))
+
+    def test_and_operator(self):
+        self.assertTrue(TestLexer.checkLexeme("a&&b&c", "a,&&,b,Error Token &", 124))
+
+    # Test comment:
+    
+    def test_block_cmt_1(self):
+        self.assertTrue(TestLexer.checkLexeme("*****", "*,<EOF>", 125))
+
+    def test_block_cmt_2(self):
+        self.assertTrue(TestLexer.checkLexeme("** ***", "*,<EOF>", 126))
+
+    def test_block_cmt_3(self):
+        self.assertTrue(TestLexer.checkLexeme("*** **", "<EOF>", 127))
+
+    # Test operators:
+
+    def test_eq_operator(self):
+        self.assertTrue(TestLexer.checkLexeme("a==Bc", "a,==,Error Token B", 128))
+
+    def test_not_and_not_eq_operators(self):
+        self.assertTrue(TestLexer.checkLexeme("!!=","!,!=,<EOF>", 129))
+
+    def test_less_assign_and_less_eq_operators(self):
+        self.assertTrue(TestLexer.checkLexeme("< = <=", "<,=,<=,<EOF>", 130))
+
+    def test_float_not_eq_operator(self):
+        self.assertTrue(TestLexer.checkLexeme("a =/=", "a,=/=,<EOF>", 131))
+
+    def test_float_less_and_greater_operators(self):
+        self.assertTrue(TestLexer.checkLexeme("a <. >.", "a,<.,>.,<EOF>", 132))
+    
+    def test_float_less_and_greater_eq_operators(self):
+        self.assertTrue(TestLexer.checkLexeme("a <=. bC >=.", "a,<=.,bC,>=.,<EOF>", 133))
+
+    # Test separators:
+
+    def test_dot_separators(self):
+        self.assertTrue(TestLexer.checkLexeme("a <. b .", "a,<.,b,.,<EOF>", 134))
+
+    def test_LP_RP_separators(self):
+        self.assertTrue(TestLexer.checkLexeme("(a)))", "(,a,),),),<EOF>", 135))
+
+    def test_LB_RB_separators(self):
+        self.assertTrue(TestLexer.checkLexeme("{aBC_123abc}{}{{", "{,aBC_123abc,},{,},{,{,<EOF>", 136))
+
+    def test_LSB_RSB_separators(self):
+        self.assertTrue(TestLexer.checkLexeme("[a]][]", "[,a,],],[,],<EOF>", 137))
+
+    def test_colon_operator(self):
+        self.assertTrue(TestLexer.checkLexeme("**:aBc", "*,*,:,aBc,<EOF>", 138))
+    
+    def test_semi_operator(self):
+        self.assertTrue(TestLexer.checkLexeme("**;aBc", "*,*,;,aBc,<EOF>", 138))
+
     # def test_illegal_escape(self):
     #     """test illegal escape"""
     #     self.assertTrue(TestLexer.checkLexeme(""" "abc\\h def"  ""","""Illegal Escape In String: abc\\h""",105))

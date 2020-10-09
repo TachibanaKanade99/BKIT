@@ -11,10 +11,10 @@ else:
 
 def serializedATN():
     with StringIO() as buf:
-        buf.write("\3\u608b\ua72a\u8133\ub9ed\u417c\u3be7\u7786\u5964\3 ")
+        buf.write("\3\u608b\ua72a\u8133\ub9ed\u417c\u3be7\u7786\u5964\3@")
         buf.write("\13\4\2\t\2\3\2\3\2\3\2\3\2\3\2\3\2\3\2\2\2\3\2\2\2\2")
-        buf.write("\t\2\4\3\2\2\2\4\5\7\23\2\2\5\6\7\32\2\2\6\7\7\30\2\2")
-        buf.write("\7\b\7\31\2\2\b\t\7\2\2\3\t\3\3\2\2\2\2")
+        buf.write("\t\2\4\3\2\2\2\4\5\7\23\2\2\5\6\7\66\2\2\6\7\7:\2\2\7")
+        buf.write("\b\79\2\2\b\t\7\2\2\3\t\3\3\2\2\2\2")
         return buf.getvalue()
 
 
@@ -32,14 +32,25 @@ class BKITParser ( Parser ):
                      "'Else'", "'ElseIf'", "'EndBody'", "'EndIf'", "'EndFor'", 
                      "'EndWhile'", "'For'", "'Function'", "'If'", "'Parameter'", 
                      "'Return'", "'Then'", "'Var'", "'While'", "'True'", 
-                     "'False'", "'EndDo'", "<INVALID>", "';'", "':'" ]
+                     "'False'", "'EndDo'", "'+'", "'+.'", "'-'", "'-.'", 
+                     "'*'", "'*.'", "'\\'", "'\\.'", "'%'", "'!'", "'&&'", 
+                     "'||'", "'=='", "'!='", "'<'", "'>'", "'<='", "'>='", 
+                     "'=/='", "'<.'", "'>.'", "'<=.'", "'>=.'", "'='", "'('", 
+                     "')'", "'{'", "'}'", "'['", "']'", "':'", "'.'", "','", 
+                     "';'" ]
 
     symbolicNames = [ "<INVALID>", "BODY", "BREAK", "CONTINUE", "DO", "ELSE", 
                       "ELSEIF", "ENDBODY", "ENDIF", "ENDFOR", "ENDWHILE", 
                       "FOR", "FUNCTION", "IF", "PARAMETER", "RETURN", "THEN", 
-                      "VAR", "WHILE", "TRUE", "FALSE", "ENDDO", "ID", "SEMI", 
-                      "COLON", "COMMENT", "WS", "ERROR_CHAR", "UNCLOSE_STRING", 
-                      "ILLEGAL_ESCAPE", "UNTERMINATED_COMMENT" ]
+                      "VAR", "WHILE", "TRUE", "FALSE", "ENDDO", "PLUS", 
+                      "FLOAT_PLUS", "MINUS", "FLOAT_MINUS", "MUL", "FLOAT_MUL", 
+                      "DIV", "FLOAT_DIV", "MOD", "NOT", "AND", "OR", "EQ", 
+                      "NOT_EQ", "LESS", "GREATER", "LESS_EQ", "GREATER_EQ", 
+                      "FLOAT_NOT_EQ", "FLOAT_LESS", "FLOAT_GREATER", "FLOAT_LESS_EQ", 
+                      "FLOAT_GREATER_EQ", "ASSIGN", "LP", "RP", "LB", "RB", 
+                      "LSB", "RSB", "COLON", "DOT", "COMMA", "SEMI", "ID", 
+                      "COMMENT", "WS", "ERROR_CHAR", "UNCLOSE_STRING", "ILLEGAL_ESCAPE", 
+                      "UNTERMINATED_COMMENT" ]
 
     RULE_program = 0
 
@@ -67,15 +78,47 @@ class BKITParser ( Parser ):
     TRUE=19
     FALSE=20
     ENDDO=21
-    ID=22
-    SEMI=23
-    COLON=24
-    COMMENT=25
-    WS=26
-    ERROR_CHAR=27
-    UNCLOSE_STRING=28
-    ILLEGAL_ESCAPE=29
-    UNTERMINATED_COMMENT=30
+    PLUS=22
+    FLOAT_PLUS=23
+    MINUS=24
+    FLOAT_MINUS=25
+    MUL=26
+    FLOAT_MUL=27
+    DIV=28
+    FLOAT_DIV=29
+    MOD=30
+    NOT=31
+    AND=32
+    OR=33
+    EQ=34
+    NOT_EQ=35
+    LESS=36
+    GREATER=37
+    LESS_EQ=38
+    GREATER_EQ=39
+    FLOAT_NOT_EQ=40
+    FLOAT_LESS=41
+    FLOAT_GREATER=42
+    FLOAT_LESS_EQ=43
+    FLOAT_GREATER_EQ=44
+    ASSIGN=45
+    LP=46
+    RP=47
+    LB=48
+    RB=49
+    LSB=50
+    RSB=51
+    COLON=52
+    DOT=53
+    COMMA=54
+    SEMI=55
+    ID=56
+    COMMENT=57
+    WS=58
+    ERROR_CHAR=59
+    UNCLOSE_STRING=60
+    ILLEGAL_ESCAPE=61
+    UNTERMINATED_COMMENT=62
 
     def __init__(self, input:TokenStream, output:TextIO = sys.stdout):
         super().__init__(input, output)

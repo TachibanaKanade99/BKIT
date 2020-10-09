@@ -54,13 +54,49 @@ FALSE: 'False';
 ENDDO: 'EndDo';
 
 // Operators:
+PLUS: '+';
+FLOAT_PLUS: '+.';
+MINUS: '-';
+FLOAT_MINUS: '-.';
+MUL: '*';
+FLOAT_MUL: '*.';
+DIV: '\\';
+FLOAT_DIV: '\\.';
+MOD: '%';
+NOT: '!';
+AND: '&&';
+OR: '||';
+EQ: '==';
+NOT_EQ: '!=';
+LESS: '<';
+GREATER: '>';
+LESS_EQ: '<=';
+GREATER_EQ: '>=';
+FLOAT_NOT_EQ: '=/=';
+FLOAT_LESS: '<.';
+FLOAT_GREATER: '>.';
+FLOAT_LESS_EQ: '<=.';
+FLOAT_GREATER_EQ: '>=.';
+ASSIGN: '=';
+
+// Separators:
+LP: '(';
+RP: ')';
+LB: '{';
+RB: '}';
+LSB: '[';
+RSB: ']';
+COLON: ':';
+DOT: '.';
+COMMA: ',';
+SEMI: ';';
+
+// Literals:
+
+
 
 // Identifiers:
 ID: [a-z][a-zA-Z_0-9]*;
-
-SEMI: ';';
-
-COLON: ':';
 
 COMMENT: '**' .*? '**' -> skip; // comment
 WS : [ \t\r\n]+ -> skip; // skip spaces, tabs, newlines
