@@ -132,10 +132,10 @@ class LexerSuite(unittest.TestCase):
         self.assertTrue(TestLexer.checkLexeme("[a]][]", "[,a,],],[,],<EOF>", 137))
 
     def test_colon_operator(self):
-        self.assertTrue(TestLexer.checkLexeme("**:aBc", "*,*,:,aBc,<EOF>", 138))
+        self.assertTrue(TestLexer.checkLexeme("*:aBc", "*,:,aBc,<EOF>", 138))
     
     def test_semi_operator(self):
-        self.assertTrue(TestLexer.checkLexeme("**;aBc", "*,*,;,aBc,<EOF>", 139))
+        self.assertTrue(TestLexer.checkLexeme("*;aBc", "*,;,aBc,<EOF>", 139))
 
     # Test Integer Literals:
 
@@ -163,18 +163,44 @@ class LexerSuite(unittest.TestCase):
 
     # Test String Literals:
     def test_string_lit(self):
-        self.assertTrue(TestLexer.checkLexeme(""" "abc" """, """ "abc",<EOF> """, 147))
+        self.assertTrue(TestLexer.checkLexeme(""" "abcabc" """, """abcabc,<EOF>""", 147))
 
-    # def test_normal_string_with_escape(self):
-    #     """test normal string with escape"""
-    #     self.assertTrue(TestLexer.checkLexeme(""" "ab'"c\\n def"  ""","""ab'"c\\n def,<EOF>""",148))
+    def test_normal_string_with_escape(self):
+        """test normal string with escape"""
+        self.assertTrue(TestLexer.checkLexeme(""" "ab'"c\\n def"  ""","""ab'"c\\n def,<EOF>""",148))
 
-    # def test_illegal_escape(self):
-    #     """test illegal escape"""
-    #     self.assertTrue(TestLexer.checkLexeme(""" "abc\\h def"  ""","""Illegal Escape In String: abc\\h""",105))
+    # Test Unclose String
 
-    # def test_unterminated_string(self):
-    #     """test unclosed string"""
-    #     self.assertTrue(TestLexer.checkLexeme(""" "abc def  ""","""Unclosed String: abc def  """,106))
+    def test_unterminated_string(self):
+        """test unclosed string"""
+        self.assertTrue(TestLexer.checkLexeme(""" "abc def  ""","""Unclosed String: abc def  """, 149))
+
+    # Test unterminated cmt:
+
+    def test_unterminated_cmt(self):
+        self.assertTrue(TestLexer.checkLexeme("** This is unclose comment", "Unterminated Comment" , 150))
+
+    # Test Illegal escape:
+
+    def test_illegal_escape(self):
+        """test illegal escape"""
+        self.assertTrue(TestLexer.checkLexeme(""" "abc\\h def"  ""","""Illegal Escape In String: abc\\h""",151))
+
+    # Test normal string:
+
+    def test_str_with_escape_char_prefix(self):
+        self.assertTrue(TestLexer.checkLexeme(""" "\\nabc" """, """\\nabc,<EOF>""", 152))
+
+    def test_str_with_escape_char_postfix(self):
+        self.assertTrue(TestLexer.checkLexeme(""" "abc\\t" """, """abc\\t,<EOF>""", 153))
+
+    def test_str_with_normal_chars_numbers(self):
+        self.assertTrue(TestLexer.checkLexeme(""" "ABCabc123ABC" """, """ABCabc123ABC,<EOF>""", 154))
+
+    def test_str_with_single_quote_escape(self):
+        self.assertTrue(TestLexer.checkLexeme(""" "abc\\'123\\nABC" """, """abc\\'123\\nABC,<EOF>""", 155))
+
+    def test_str_with_double_quote(self):
+        self.assertTrue(TestLexer.checkLexeme(""" "abc'"ABC" """, """abc'"ABC,<EOF>""", 156))
 
 
