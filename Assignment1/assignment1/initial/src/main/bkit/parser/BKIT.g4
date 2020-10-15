@@ -29,7 +29,7 @@ options{
 
 // Program Structure:
 program: many_declars EOF;
-many_declars: global_var_declar_lst func_declar_lst main_func;
+many_declars: global_var_declar_lst func_declar_lst;
 
 // Global variable declaration:
 global_var_declar_lst: var_decl many_var_decl | ;
@@ -41,7 +41,8 @@ var_lst: var many_var;
 many_var: COMMA var many_var | ;
 
 // Variable:
-var: ( ID | composite_var ) ASSIGN lit;
+var: ( ID | composite_var ) initial_value;
+initial_value: ASSIGN lit | ;
 composite_var: ID dimension_lst;
 dimension_lst: dimension many_dimension;
 many_dimension: dimension many_dimension | ;
@@ -65,7 +66,7 @@ stmt_lst: stmt many_stmts | ;
 many_stmts: stmt many_stmts | ;
 
 // Main function:
-main_func: FUNCTION COLON 'main' body;
+// main_func: FUNCTION COLON 'main' body;
 
 // Expression:
 
@@ -221,10 +222,10 @@ BOOL_LIT: TRUE | FALSE;
 
 // String Literals:
 fragment ESCAPE_QUOTE: '\'' '"';
-fragment ESCAPE_CHAR: '\\' ( [bfrnt'\\] ); 
+fragment ESCAPE_CHAR: '\\' [bfrnt'\\]; 
 STRING_LIT: '"' ( ~['"\\] | ESCAPE_CHAR | ESCAPE_QUOTE )* '"' {self.text = self.text[1:-1]};
 
-lit: INT_LIT | FLOAT_LIT | BOOL_LIT | STRING_LIT;
+lit: INT_LIT | FLOAT_LIT | BOOL_LIT | STRING_LIT | array_lit;
 
 // Array Literals:
 array_lit: LB lit_list RB;
@@ -235,5 +236,5 @@ many_lits: COMMA lit many_lits | ;
 ERROR_CHAR: .;
 // UNCLOSE_STRING: .;
 UNCLOSE_STRING: '"' ( ~['"\\] | ESCAPE_CHAR | ESCAPE_QUOTE )* {self.text = self.text[1:]};
-ILLEGAL_ESCAPE: '"' ( ~['"\\] | ESCAPE_CHAR | ESCAPE_QUOTE )* ( '\\' ~ ( [bfrnt\\] | '\'' ) ) {self.text = self.text[1:]};
+ILLEGAL_ESCAPE: '"' ( ~['"\\] | ESCAPE_CHAR | ESCAPE_QUOTE )* ('\\' ~[bfrnt'\\] | '\'' ~["] ) {self.text = self.text[1:]};
 UNTERMINATED_COMMENT: '**' .*?;

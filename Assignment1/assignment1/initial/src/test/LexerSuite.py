@@ -207,4 +207,12 @@ class LexerSuite(unittest.TestCase):
     def test_var_decl_tokens(self):
         self.assertTrue(TestLexer.checkLexeme("Var: a = 5;", "Var,:,a,=,5,;,<EOF>", 157))
 
+    # Test array literal:
+    def test_array_literal(self):
+        self.assertTrue(TestLexer.checkLexeme("{1}", "{,1,},<EOF>", 158))
+
+    # Test Illegal Escape for Single quote:
+    def test_illegal_escape_for_single_quote(self):
+        self.assertTrue(TestLexer.checkLexeme(""" "abc'abc" ""","""Illegal Escape In String: abc'a""", 159))
+
 
