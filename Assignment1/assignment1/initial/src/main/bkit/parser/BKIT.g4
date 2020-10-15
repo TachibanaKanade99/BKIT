@@ -90,7 +90,7 @@ operand_7: ID LP argument_lst RP | lit | ID | LP expr RP;
 // Function call:
 argument_lst: argument many_arguments | ;
 many_arguments: argument many_arguments | ;
-argument: .;
+argument: ID | lit;
 
 
 // Statement:
