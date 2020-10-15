@@ -3,8 +3,13 @@ from TestUtils import TestParser
 
 class ParserSuite(unittest.TestCase):
     def test_simple_program(self):
-        """Simple program: int main() {} """
-        input = """Var: x;"""
+        """ Simple Program """
+        input = """
+        Var: a = 5;
+        Function: main
+            Body:
+            EndBody.
+        """
         expect = "successful"
         self.assertTrue(TestParser.checkParser(input,expect,201))
     

@@ -203,4 +203,8 @@ class LexerSuite(unittest.TestCase):
     def test_str_with_double_quote(self):
         self.assertTrue(TestLexer.checkLexeme(""" "abc'"ABC" """, """abc'"ABC,<EOF>""", 156))
 
+    # Test variable_decl_tokens:
+    def test_var_decl_tokens(self):
+        self.assertTrue(TestLexer.checkLexeme("Var: a = 5;", "Var,:,a,=,5,;,<EOF>", 157))
+
 

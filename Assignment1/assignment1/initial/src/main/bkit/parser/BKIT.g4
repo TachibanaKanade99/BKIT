@@ -36,12 +36,12 @@ global_var_declar_lst: var_decl many_var_decl | ;
 many_var_decl: var_decl many_var_decl | ;
 
 // Variable declaration:
-var_decl: VAR COLON var_lst;
+var_decl: VAR COLON var_lst SEMI;
 var_lst: var many_var;
 many_var: COMMA var many_var | ;
 
 // Variable:
-var: ( ID | composite_var ) EQ LIT;
+var: ( ID | composite_var ) ASSIGN lit;
 composite_var: ID dimension_lst;
 dimension_lst: dimension many_dimension;
 many_dimension: dimension many_dimension | ;
@@ -69,20 +69,68 @@ main_func: FUNCTION COLON 'main' body;
 
 // Expression:
 
+expr: operand_1 (EQ | NOT_EQ) operand_1
+    | operand_1 (LESS | GREATER) operand_1
+    | operand_1 (LESS_EQ | GREATER_EQ) operand_1
+    | operand_1 FLOAT_NOT_EQ operand_1
+    | operand_1 (FLOAT_LESS | FLOAT_GREATER) operand_1
+    | operand_1 (FLOAT_LESS_EQ | FLOAT_GREATER_EQ) operand_1
+    | operand_1;
+operand_1: operand_1 (AND | OR) operand_2 | operand_2;
+operand_2: operand_2 (PLUS | FLOAT_PLUS | MINUS | FLOAT_MINUS) operand_3 | operand_3;
+operand_3: operand_3 (MUL | FLOAT_MUL | DIV | FLOAT_DIV | MOD) operand_4 | operand_4;
+operand_4: NOT operand_4 | operand_5;
+operand_5: (MINUS | FLOAT_MINUS) operand_5 | operand_6;
+// Index operators:
+operand_6: operand_6 index_ops | operand_7;
+index_ops: LSB operand_6 RSB | LSB operand_6 RSB index_ops;
+operand_7: ID LP argument_lst RP | lit | ID | LP expr RP;
+
 // Function call:
-func_call: ID LP argument_lst RP;
 argument_lst: argument many_arguments | ;
 many_arguments: argument many_arguments | ;
 argument: .;
 
-// Index operators:
-ele_expr: expr index_op;
-index_op: LSB expr RSB | LSB expr RSB index_op;
-
-expr: .;
 
 // Statement:
-stmt: .;
+stmt: var_decl | assign_stmt | if_stmt | for_stmt | while_stmt | do_while_stmt | break_stmt | continue_stmt | call_stmt | return_stmt;
+
+// Assign Statement:
+assign_stmt: (ID | composite_var) ASSIGN expr;
+
+// If Statement:
+if_stmt: IF expr THEN stmt_lst elseif_stmt_lst else_stmt;
+
+// ElseIf Statement:
+elseif_stmt_lst: elseif_stmt many_elseif_stmts | ;
+many_elseif_stmts: elseif_stmt many_elseif_stmts | ; 
+elseif_stmt: ELSEIF expr THEN stmt_lst;
+
+// Else Statement:
+else_stmt: ELSE stmt_lst | ;
+
+// For Statement:
+for_stmt: FOR LP ID ASSIGN expr COMMA expr COMMA expr RP DO stmt_lst ENDFOR DOT;
+
+// While Statement:
+while_stmt: WHILE expr DO stmt_lst ENDWHILE DOT;
+
+// Do While Statement:
+do_while_stmt: DO stmt_lst WHILE expr ENDDO DOT;
+
+// Break Statement:
+break_stmt: BREAK SEMI;
+
+// Continue Statement:
+continue_stmt: CONTINUE SEMI;
+
+// Call Statement:
+call_stmt: ID LP expr_lst RP SEMI;
+expr_lst: expr many_exprs | ;
+many_exprs: COMMA expr many_exprs | ;
+
+// Return Statement:
+return_stmt: RETURN SEMI | RETURN expr SEMI;
 
 // Lexical:
 
@@ -176,12 +224,12 @@ fragment ESCAPE_QUOTE: '\'' '"';
 fragment ESCAPE_CHAR: '\\' ( [bfrnt'\\] ); 
 STRING_LIT: '"' ( ~['"\\] | ESCAPE_CHAR | ESCAPE_QUOTE )* '"' {self.text = self.text[1:-1]};
 
-LIT: INT_LIT | FLOAT_LIT | BOOL_LIT | STRING_LIT;
+lit: INT_LIT | FLOAT_LIT | BOOL_LIT | STRING_LIT;
 
 // Array Literals:
 array_lit: LB lit_list RB;
-lit_list: LIT many_lits;
-many_lits: COMMA LIT many_lits | ;
+lit_list: lit many_lits;
+many_lits: COMMA lit many_lits | ;
 
 
 ERROR_CHAR: .;
