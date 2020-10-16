@@ -81,26 +81,26 @@ operand_1: operand_1 (AND | OR) operand_2 | operand_2;
 operand_2: operand_2 (PLUS | FLOAT_PLUS | MINUS | FLOAT_MINUS) operand_3 | operand_3;
 operand_3: operand_3 (MUL | FLOAT_MUL | DIV | FLOAT_DIV | MOD) operand_4 | operand_4;
 operand_4: NOT operand_4 | operand_5;
-operand_5: (MINUS | FLOAT_MINUS) operand_5 | operand_6;
+operand_5: (MINUS | FLOAT_MINUS) operand_5 | index_expr;
 // Index operators:
-operand_6: operand_6 index_ops | operand_7;
-index_ops: LSB operand_6 RSB | LSB operand_6 RSB index_ops;
+index_expr: index_expr index_ops | operand_7;
+index_ops: LSB expr RSB | LSB expr RSB index_ops;
 operand_7: ID LP argument_lst RP | lit | ID | LP expr RP;
 
 // Function call:
 argument_lst: argument many_arguments | ;
-many_arguments: argument many_arguments | ;
-argument: ID | lit;
+many_arguments: COMMA argument many_arguments | ;
+argument: ID | composite_var | lit | expr;
 
 
 // Statement:
 stmt: var_decl | assign_stmt | if_stmt | for_stmt | while_stmt | do_while_stmt | break_stmt | continue_stmt | call_stmt | return_stmt;
 
 // Assign Statement:
-assign_stmt: (ID | composite_var) ASSIGN expr;
+assign_stmt: (ID | index_expr) ASSIGN expr SEMI;
 
 // If Statement:
-if_stmt: IF expr THEN stmt_lst elseif_stmt_lst else_stmt;
+if_stmt: IF expr THEN stmt_lst elseif_stmt_lst else_stmt ENDIF DOT;
 
 // ElseIf Statement:
 elseif_stmt_lst: elseif_stmt many_elseif_stmts | ;

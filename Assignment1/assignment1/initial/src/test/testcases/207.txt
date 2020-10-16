@@ -1,0 +1,7 @@
+
+        Function: foo
+            Parameter: n
+            Body:
+                n = 10;
+            EndBody.
+        

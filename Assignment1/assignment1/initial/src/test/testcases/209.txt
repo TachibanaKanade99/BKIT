@@ -1,0 +1,10 @@
+
+        Function: foo
+            Parameter: a
+            Body:
+                a = a +. 10.0;
+                b = a;
+                If (c < a) Then c = a;
+                EndIf. 
+            EndBody.
+        

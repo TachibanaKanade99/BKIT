@@ -1,0 +1,7 @@
+
+        Function: main
+            Body:
+                If i < 10 Then i = i + 1;
+                EndIf.
+            EndBody.
+        

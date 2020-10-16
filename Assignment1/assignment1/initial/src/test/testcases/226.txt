@@ -1,0 +1,10 @@
+
+        Function: foo
+            Body:
+            EndBody.
+
+        Function: main
+            Body: 
+                a = foo(a, a * 10, b[10], 23);
+            EndBody.
+        
