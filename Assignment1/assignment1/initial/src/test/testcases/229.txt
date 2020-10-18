@@ -1,0 +1,8 @@
+
+            Function: main
+                Body:
+                    If i == 0 Then i = i + 1;
+                    Else i = i - 1;
+                    EndIf.
+                EndBody.
+        

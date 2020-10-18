@@ -155,7 +155,7 @@ class LexerSuite(unittest.TestCase):
         self.assertTrue(TestLexer.checkLexeme("0o567", "0o567,<EOF>", 144))
 
     def test_octal_2(self):
-        self.assertTrue(TestLexer.checkLexeme("0199", "0,199,<EOF>", 145))
+        self.assertTrue(TestLexer.checkLexeme("0O127", "0O127,<EOF>", 145))
 
     # Test Float Literals:
     def test_float_lit(self):
@@ -214,5 +214,159 @@ class LexerSuite(unittest.TestCase):
     # Test Illegal Escape for Single quote:
     def test_illegal_escape_for_single_quote(self):
         self.assertTrue(TestLexer.checkLexeme(""" "abc'abc" ""","""Illegal Escape In String: abc'a""", 159))
+
+    # Test double quotes inside string:
+    def test_double_quotes_inside_string(self):
+        self.assertTrue(TestLexer.checkLexeme(""" "abc123"abc"ABC" """, """abc123,abc,ABC,<EOF>""", 160))
+
+    # Test float number:
+    def test_float_number_with_decimal_point(self):
+        input = "12.345"
+        expect = "12.345,<EOF>"
+        self.assertTrue(TestLexer.checkLexeme(input, expect, 161))
+
+    def test_float_number_with_decimal_point_and_exp(self):
+        self.assertTrue(TestLexer.checkLexeme("12.0e3", "12.0e3,<EOF>", 162))
+
+    def test_float_number_with_no_digit_after_decimal_point(self):
+        self.assertTrue(TestLexer.checkLexeme("12.", "12.,<EOF>", 163))
+
+    def test_zero_and_float_number(self):
+        self.assertTrue(TestLexer.checkLexeme("021.3", "0,21.3,<EOF>", 164))
+
+    def test_float_number_with_positive_sign_exp(self):
+        self.assertTrue(TestLexer.checkLexeme("12.3e+3", "12.3e+3,<EOF>", 165))
+
+    def test_float_number_with_neg_sign(self):
+        self.assertTrue(TestLexer.checkLexeme("12e-3", "12e-3,<EOF>", 166))
+
+    # Test string:
+    def test_string_with_only_escape_chars(self):
+        self.assertTrue(TestLexer.checkLexeme(""" "\\b\\t\\n\\f\\\\" """, """\\b\\t\\n\\f\\\\,<EOF>""", 167))
+
+    # Test int literals with hexadecimal and octal prefixes:
+    def test_hexadecimal_with_prefix_only(self):
+        self.assertTrue(TestLexer.checkLexeme("0x 0X", "0,x,0,Error Token X", 168))
+
+    def test_octal_with_prefix_only(self):
+        self.assertTrue(TestLexer.checkLexeme("0o 0O", "0,o,0,Error Token O", 169))
+
+    # Test keywords:
+    def test_keywords_no_space(self):
+        self.assertTrue(TestLexer.checkLexeme("ElseIfIfEndIf", "ElseIf,If,EndIf,<EOF>", 170))
+
+    # Test negative value in intlit and floatlit:
+    def test_negative_intlit(self):
+        self.assertTrue(TestLexer.checkLexeme("-1", "-,1,<EOF>", 171))
+
+    def test_negative_floatlit(self):
+        self.assertTrue(TestLexer.checkLexeme("-12.3e-12", "-,12.3e-12,<EOF>", 172))
+
+    def test_array_literal_with_spaces(self):
+        self.assertTrue(TestLexer.checkLexeme("{  1,2,  }", "{,1,,,2,,,},<EOF>", 173))
+
+    # Test stringlit:
+    def test_uppercase_inside_string(self):
+        self.assertTrue(TestLexer.checkLexeme(""" "ABC"ABC """, """ABC,Error Token A""", 174))
+
+    def test_special_chars_in_string(self):
+        self.assertTrue(TestLexer.checkLexeme(""" "$#@~" """, """$#@~,<EOF>""", 175))
+
+    def test_special_chars_outside_str(self):
+        self.assertTrue(TestLexer.checkLexeme(""" "$#@~"$#@~ """, """$#@~,Error Token $""", 176))
+
+    def test_string_inside_string(self):
+        self.assertTrue(TestLexer.checkLexeme(""" ""abcAbcabc"" """, """,abcAbcabc,,<EOF>""", 177))
+
+    def test_comment_inside_array_lit(self):
+        self.assertTrue(TestLexer.checkLexeme("{ ** This is comment ** }", "{,},<EOF>", 178))
+
+    def test_octal_with_id(self):
+        self.assertTrue(TestLexer.checkLexeme("0o12oo", "0o12,oo,<EOF>", 179))
+
+    def test_cmt_token(self):
+        self.assertTrue(TestLexer.checkLexeme("123abc * * abc", "123,abc,*,*,abc,<EOF>", 180))
+
+    def test_float_not_eq_op(self):
+        self.assertTrue(TestLexer.checkLexeme("abc =/= 123 \. *. +.", "abc,=/=,123,\.,*.,+.,<EOF>", 181))
+
+    def test_cmt_inside_str(self):
+        self.assertTrue(TestLexer.checkLexeme(""" "abc **this is comment" """, """abc **this is comment,<EOF>""", 182))
+
+    def test_unclose_str_inside_str(self):
+        self.assertTrue(TestLexer.checkLexeme(""" "abcABC""abc """, """abcABC,Unclosed String: abc """, 183))
+
+    def test_wrong_escape_for_double_quote(self):
+        self.assertTrue(TestLexer.checkLexeme(""" "abc\\"ABC" """, """Illegal Escape In String: abc\\\"""", 184))
+
+    def test_single_quote_for__escape_legal_escape(self):
+        self.assertTrue(TestLexer.checkLexeme(""" "abcABC\\n abc'b" """, """Illegal Escape In String: abcABC\\n abc'b""", 185))
+
+    def test_escape_single_quote_follow_double_quote(self):
+        self.assertTrue(TestLexer.checkLexeme(""" "abc\\'"" """, """abc\\',Unclosed String:  """, 186))
+
+    def test_wrong_escape_with_number(self):
+        self.assertTrue(TestLexer.checkLexeme(""" "abc\\1aBc%^&" """, """Illegal Escape In String: abc\\1""", 187))
+
+    def test_single_quote_at_the_end_of_str(self):
+        self.assertTrue(TestLexer.checkLexeme(""" "abcAbC'" """, """Unclosed String: abcAbC'" """, 188))
+
+    def test_comment_in_new_line(self):
+        self.assertTrue(TestLexer.checkLexeme("""
+            ** This
+            is
+            a
+            comment
+            **
+        ""","""<EOF>""", 189))
+
+    def test_unterminated_comment_new_line(self):
+        self.assertTrue(TestLexer.checkLexeme("""
+        ** This
+        is 
+        unterminated
+        * comment
+        """, """Unterminated Comment""", 190))
+
+    def test_illegal_escape_with_backslash_end_of_str(self):
+        self.assertTrue(TestLexer.checkLexeme(""" "abcABC\\" """, """Illegal Escape In String: abcABC\\\"""", 191))
+
+    def test_forward_slash(self):
+        self.assertTrue(TestLexer.checkLexeme("this is / forward slash", "this,is,Error Token /", 192))
+
+    def test_div_op_and_back_slash(self):
+        self.assertTrue(TestLexer.checkLexeme("\ backslash \\", "\,backslash,\,<EOF>", 193))
+
+    def test_four_spaces_in_str(self):
+        self.assertTrue(TestLexer.checkLexeme(""" "ABCabc   " """, """ABCabc   ,<EOF>""", 194))
+
+    def test_zero_at_start_of_floatlit(self):
+        self.assertTrue(TestLexer.checkLexeme("012.012e-03", "0,12.012e-03,<EOF>", 195))
+
+    def test_zero_in_exponent_floatlit(self):
+        self.assertTrue(TestLexer.checkLexeme("12.0e-000012", "12.0e-000012,<EOF>", 196))
+
+    def test_zero_in_decimal_point_floatlit(self):
+        self.assertTrue(TestLexer.checkLexeme("1200.0001203", "1200.0001203,<EOF>", 197))
+
+    def test_many_dots_in_floatlit(self):
+        self.assertTrue(TestLexer.checkLexeme("12.3.1.567.00","12.3,.,1.567,.,0,0,<EOF>", 198))
+
+    def test_exponent_alone(self):
+        self.assertTrue(TestLexer.checkLexeme("e-12", "e,-,12,<EOF>", 199))
+
+    def test_zero_in_int_part(self):
+        self.assertTrue(TestLexer.checkLexeme("0.12e-3", "0.12e-3,<EOF>", 200))
+
+
+
+
+
+
+
+
+
+
+
 
 

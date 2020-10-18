@@ -1,0 +1,9 @@
+
+        Function: foo
+            Parameter: a, b[1]
+            Body:
+            
+            EndBody.
+            
+        Var: a = 10;
+        

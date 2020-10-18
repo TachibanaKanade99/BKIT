@@ -169,8 +169,13 @@ class BKITVisitor(ParseTreeVisitor):
         return self.visitChildren(ctx)
 
 
-    # Visit a parse tree produced by BKITParser#operand_7.
-    def visitOperand_7(self, ctx:BKITParser.Operand_7Context):
+    # Visit a parse tree produced by BKITParser#func_call.
+    def visitFunc_call(self, ctx:BKITParser.Func_callContext):
+        return self.visitChildren(ctx)
+
+
+    # Visit a parse tree produced by BKITParser#operand.
+    def visitOperand(self, ctx:BKITParser.OperandContext):
         return self.visitChildren(ctx)
 
 

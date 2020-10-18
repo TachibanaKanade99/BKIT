@@ -1,0 +1,6 @@
+
+        Function: main
+            Body:
+                foo(2 * x + 3);
+            EndBody.
+        

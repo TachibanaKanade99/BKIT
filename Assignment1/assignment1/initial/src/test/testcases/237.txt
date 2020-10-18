@@ -1,0 +1,11 @@
+
+        Function: foo
+            Parameter: a, b, a[12]
+            Body:
+                Var: i, j = 0;
+                For (i = j, i < 100, i + 1) Do
+                    If i < 90 Then Break;
+                    EndIf.
+                EndFor.
+            EndBody.
+        

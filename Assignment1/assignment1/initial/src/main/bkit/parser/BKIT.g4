@@ -82,15 +82,19 @@ operand_2: operand_2 (PLUS | FLOAT_PLUS | MINUS | FLOAT_MINUS) operand_3 | opera
 operand_3: operand_3 (MUL | FLOAT_MUL | DIV | FLOAT_DIV | MOD) operand_4 | operand_4;
 operand_4: NOT operand_4 | operand_5;
 operand_5: (MINUS | FLOAT_MINUS) operand_5 | index_expr;
+
 // Index operators:
-index_expr: index_expr index_ops | operand_7;
+index_expr: index_expr index_ops | func_call;
 index_ops: LSB expr RSB | LSB expr RSB index_ops;
-operand_7: ID LP argument_lst RP | lit | ID | LP expr RP;
+
+// Function call:
+func_call: ID LP argument_lst RP | operand;
+operand: lit | ID | LP expr RP;
 
 // Function call:
 argument_lst: argument many_arguments | ;
 many_arguments: COMMA argument many_arguments | ;
-argument: ID | composite_var | lit | expr;
+argument: expr;
 
 
 // Statement:
@@ -209,13 +213,13 @@ WS : [ \t\r\n]+ -> skip; // skip spaces, tabs, newlines
 fragment DIGIT: [0-9];
 fragment INT: [1-9] DIGIT* | '0';
 fragment HEXA_DEC: '0'[Xx] [0-9A-F]+;
-fragment OCTAL: '0'[Oo] [0-7]+;
+fragment OCTAL: '0'[oO] [0-7]+;
 INT_LIT: INT | HEXA_DEC | OCTAL;
 
 // Float Literal:
 fragment DECIMAL_PART: '.' DIGIT*;
 fragment EXPONENT_PART: [Ee] [+-]? DIGIT+;
-FLOAT_LIT: (INT DECIMAL_PART? EXPONENT_PART) | (INT DECIMAL_PART EXPONENT_PART?);  
+FLOAT_LIT: INT DECIMAL_PART? EXPONENT_PART | INT DECIMAL_PART EXPONENT_PART?;
 
 // Boolean Literal:
 BOOL_LIT: TRUE | FALSE;
@@ -223,7 +227,7 @@ BOOL_LIT: TRUE | FALSE;
 // String Literals:
 fragment ESCAPE_QUOTE: '\'' '"';
 fragment ESCAPE_CHAR: '\\' [bfrnt'\\]; 
-STRING_LIT: '"' ( ~['"\\] | ESCAPE_CHAR | ESCAPE_QUOTE )* '"' {self.text = self.text[1:-1]};
+STRING_LIT: '"' ( ~['"\b\f\r\n\t\\] | ESCAPE_CHAR | ESCAPE_QUOTE )* '"' {self.text = self.text[1:-1]};
 
 lit: INT_LIT | FLOAT_LIT | BOOL_LIT | STRING_LIT | array_lit;
 
@@ -233,8 +237,9 @@ lit_list: lit many_lits;
 many_lits: COMMA lit many_lits | ;
 
 
+
 ERROR_CHAR: .;
 // UNCLOSE_STRING: .;
-UNCLOSE_STRING: '"' ( ~['"\\] | ESCAPE_CHAR | ESCAPE_QUOTE )* {self.text = self.text[1:]};
-ILLEGAL_ESCAPE: '"' ( ~['"\\] | ESCAPE_CHAR | ESCAPE_QUOTE )* ('\\' ~[bfrnt'\\] | '\'' ~["] ) {self.text = self.text[1:]};
+UNCLOSE_STRING: '"' ( ~['"\b\f\r\n\t\\] | ESCAPE_CHAR | ESCAPE_QUOTE )* {self.text = self.text[1:]};
+ILLEGAL_ESCAPE: '"' ( ~['"\b\f\r\n\t\\] | ESCAPE_CHAR | ESCAPE_QUOTE )* ('\\' ~[bfrnt'\\] | '\'' ~["] ) {self.text = self.text[1:]};
 UNTERMINATED_COMMENT: '**' .*?;
