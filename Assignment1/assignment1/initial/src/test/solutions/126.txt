@@ -1,1 +1,1 @@
-*,<EOF>
+ this is a string: '"abc\nxyz'",<EOF>

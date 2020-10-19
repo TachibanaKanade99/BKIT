@@ -1,1 +1,1 @@
- "abc\"ABC" 
+0x123ABCX

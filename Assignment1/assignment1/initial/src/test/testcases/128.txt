@@ -1,1 +1,1 @@
-a==Bc
+"This is a string: **This is a comment* "

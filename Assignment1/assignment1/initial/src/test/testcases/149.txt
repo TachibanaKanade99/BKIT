@@ -1,1 +1,4 @@
- "abc def  
+While (weight >=.70.5e0) Do 
+	exercise();
+	diet();
+EndWhile.

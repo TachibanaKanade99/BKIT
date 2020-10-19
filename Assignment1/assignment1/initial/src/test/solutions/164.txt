@@ -1,1 +1,1 @@
-0,21.3,<EOF>
+Kira Kira a la mode!\n,Franciso '"!@#$%^&*'",Unclosed String: Wut!

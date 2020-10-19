@@ -213,8 +213,8 @@ WS : [ \t\r\n]+ -> skip; // skip spaces, tabs, newlines
 // Integer Literal:
 fragment DIGIT: [0-9];
 fragment INT: [1-9] DIGIT* | '0';
-fragment HEXA_DEC: '0'[Xx] [0-9A-F]+;
-fragment OCTAL: '0'[oO] [0-7]+;
+fragment HEXA_DEC: '0'[Xx] [1-9A-F] [0-9A-F]*;
+fragment OCTAL: '0'[oO] [1-7] [0-7]*;
 INT_LIT: INT | HEXA_DEC | OCTAL;
 
 // Float Literal:
@@ -240,7 +240,6 @@ many_lits: COMMA lit many_lits | ;
 
 
 ERROR_CHAR: .;
-// UNCLOSE_STRING: .;
 UNCLOSE_STRING: '"' ( ~['"\b\f\r\n\t\\] | ESCAPE_CHAR | ESCAPE_QUOTE )* {self.text = self.text[1:]};
 ILLEGAL_ESCAPE: '"' ( ~['"\b\f\r\n\t\\] | ESCAPE_CHAR | ESCAPE_QUOTE )* ('\\' ~[bfrnt'\\] | '\'' ~["] ) {self.text = self.text[1:]};
 UNTERMINATED_COMMENT: '**' .*?;

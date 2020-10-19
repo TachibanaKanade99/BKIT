@@ -680,18 +680,401 @@ class ParserSuite(unittest.TestCase):
         expect = "Error on line 4 col 22: ["
         self.assertTrue(TestParser.checkParser(input, expect, 263))
 
+    def test_array_decl_with_many_dimen(self):
+        input = """
+        Function: main
+            Body:
+                Var: arr[1][2][3][4][5][6][7][8] = {1, {3, 4, {5, 6, {7, 8,{9, 10}}}}};
+            EndBody.
+        """
+        expect = "successful"
+        self.assertTrue(TestParser.checkParser(input, expect, 264))
 
+    def test_printLn_function(self):
+        input = """
+        Function: main
+            Body:
+                printLn();
+            EndBody.
+        """
+        expect = "successful"
+        self.assertTrue(TestParser.checkParser(input, expect, 265))
 
+    def test_print_function(self):
+        input = """
+        Function: main
+            Body:
+                print(arg);
+            EndBody.
+        """
+        expect = "successful"
+        self.assertTrue(TestParser.checkParser(input, expect, 266))
 
+    def test_printStrLn_function(self):
+        input = """
+        Function: main
+            Body:
+                printStrLn(arg);
+            EndBody.
+        """
+        expect = "successful"
+        self.assertTrue(TestParser.checkParser(input, expect, 267))
 
+    def test_float_lit_with_assign_stmt(self):
+        input = """
+        Function: main
+            Body:
+                Var: a = 12.3;
+            EndBody.
+        """
+        expect = "successful"
+        self.assertTrue(TestParser.checkParser(input, expect, 268))
 
+    def test_wrong_float_lit_with_assign_stmt(self):
+        input = """
+        Function: main
+            Body:
+                Var: a = 012.3;
+            EndBody.
+        """
+        expect = "Error on line 4 col 26: 12.3"
+        self.assertTrue(TestParser.checkParser(input, expect, 269))
 
+    def test_int_lit_with_assign_stmt(self):
+        input = """
+        Function: main
+            Body:
+                Var: a = 12;
+            EndBody.
+        """
+        expect = "successful"
+        self.assertTrue(TestParser.checkParser(input, expect, 270))
 
+    def test_wrong_int_lit_with_assign_stmt(self):
+        input = """
+        Function: main
+            Body:
+                Var: a = 0012;
+            EndBody.
+        """
+        expect = "Error on line 4 col 26: 0"
+        self.assertTrue(TestParser.checkParser(input, expect, 271))
 
+    def test_stringlit_in_if_stmt(self):
+        input = """
+        Function: main
+            Body: 
+                If {1} Then Return True;
+                Else If "Hey this is string \\n\\t" Then Return False; EndIf.
+                EndIf.
+            EndBody.
+        """
+        expect = "successful"
+        self.assertTrue(TestParser.checkParser(input, expect, 272))
 
+    def test_many_stringlits_in_if_stmt(self):
+        input = """
+                Function: main
+                    Body: 
+                        If {1} Then Return True;
+                        Else If "Hey this is string \\n\\t" + "True" Then Return False; EndIf.
+                        EndIf.
+                    EndBody.
+                """
+        expect = "successful"
+        self.assertTrue(TestParser.checkParser(input, expect, 273))
 
+    def test_read_function(self):
+        input = """
+        Function: main
+            Body:
+                read(printLn());
+            EndBody.
+        """
+        expect = "successful"
+        self.assertTrue(TestParser.checkParser(input, expect, 274))
 
+    def test_comment_in_stmt(self):
+        input = """
+        Function: main
+            Body:
+                Var: a;
+                a = ** this is comment **;
+            EndBody.
+        """
+        expect = "Error on line 5 col 41: ;"
+        self.assertTrue(TestParser.checkParser(input, expect, 275))
 
+    def test_octal_inlit_in_stmt(self):
+        input = """
+        Function: main
+            Body:
+                Var: a[2] = {10, {20, 30}};
+                b = b *. c \. 0O77;
+            EndBody.
+        """
+        expect = "successful"
+        self.assertTrue(TestParser.checkParser(input, expect, 276))
+
+    def test_precedence_of_logical_op(self):
+        input = """
+        Function: main
+            Body:
+                Var: a[2][3] = {2.3, {1.20e-3}};
+                a[0][0] = b <= c[2][3] || b >= d[2][3];
+            EndBody.
+        """
+        expect = "Error on line 5 col 44: >="
+        self.assertTrue(TestParser.checkParser(input, expect, 277))
+
+    def test_precedence_of_greater_eq_op_in_parenthesis(self):
+        input = """
+        Function: main
+            Body:
+                Var: a[2][3] = {2.3, {1.20e-3}};
+                a[0][0] = b <= c[2][3] || (b >= d[2][3]);
+            EndBody.
+        """
+        expect = "successful"
+        self.assertTrue(TestParser.checkParser(input, expect, 278))
+
+    def test_predence_of_left_operand_of_logical_op(self):
+        input = """
+        Function: main
+            Body:
+                a = (1 < 2) || a <= b;
+            EndBody.
+        """
+        expect = "successful"
+        self.assertTrue(TestParser.checkParser(input, expect, 279))
+
+    def test_prededence_of_plus_mul_div_op(self):
+        input = """
+        Function: main
+            Body:
+                a = 2 * 3 \. 3 - 2;
+            EndBody.
+        """
+        expect = "successful"
+        self.assertTrue(TestParser.checkParser(input, expect, 280))
+
+    def test_precedence_of_parenthesis(self):
+        input = """
+        Function: main
+            Body:
+                a = (1 == (a <= b || (abc - 45)));
+                a = -b + -.c;
+            EndBody.
+        """
+        expect = "successful"
+        self.assertTrue(TestParser.checkParser(input, expect, 281))
+
+    def test_many_if_while_stmt(self):
+        input = """
+        Function: main
+            Body: 
+                While False Do
+                    If 1 Then 
+                        If 2 Then
+                        ElseIf 4 Then 
+                        ElseIf 6 Then
+                        ElseIf 7 Then
+                        EndIf.
+                    EndIf.
+                EndWhile.     
+            EndBody.
+        """
+        expect = "successful"
+        self.assertTrue(TestParser.checkParser(input, expect, 282))
+
+    def test_str_as_exp_in_for_stmt(self):
+        input = """
+        Function: main
+            Body:
+                For (a = "str", "str", "Hiiii") Do EndFor.
+            EndBody.
+        """
+        expect = "successful"
+        self.assertTrue(TestParser.checkParser(input, expect, 283))
+
+    def test_octal_in_exp_while_stmt(self):
+        input = """
+        Function: main
+            Body:
+                While 0X123ABF || a && c Do Var: a,b,c; Return; EndWhile.
+            EndBody.
+        """
+        expect = "successful"
+        self.assertTrue(TestParser.checkParser(input, expect, 284))
+
+    def test_greater_op(self):
+        input = """
+        Function: main
+            Body:
+                object = 4123542 > 7 > 4;
+            EndBody.
+        """
+        expect = "Error on line 4 col 37: >"
+        self.assertTrue(TestParser.checkParser(input, expect, 285))
+
+    def test_continue_as_expr(self):
+        input = """
+        Function: main
+            Body:
+                Continue = 2;
+            EndBody.
+        """
+        expect = "Error on line 4 col 25: ="
+        self.assertTrue(TestParser.checkParser(input, expect, 286))
+
+    def test_return_is_operand(self):
+        input = """
+        Function: main
+            Body:
+                a = Return + 12 \. 4.5;
+            EndBody.
+        """
+        expect = "Error on line 4 col 20: Return"
+        self.assertTrue(TestParser.checkParser(input, expect, 287))
+
+    def test_index_exp_in_var_decl(self):
+        input = """
+        Function: foo
+        Parameter: a[5], b
+        Body:
+            Var: i = 0;
+            While (i < 5) Do
+                a[i] = b +. 1.0;
+                i = i + 1;
+            EndWhile.
+        EndBody.
+        """
+        expect = "successful"
+        self.assertTrue(TestParser.checkParser(input, expect, 288))
+
+    def test_dimension_is_not_intlit(self):
+        input = """
+        Function: main
+            Body:
+                Var: a[i] = 10;
+            EndBody.
+        """
+        expect = "Error on line 4 col 23: i"
+        self.assertTrue(TestParser.checkParser(input, expect, 289))
+
+    def test_none_association_on_eq(self):
+        input = """
+        Function: main
+            Body:
+                a = 1 == 2 == 4;
+            EndBody.
+        """
+        expect = "Error on line 4 col 27: =="
+        self.assertTrue(TestParser.checkParser(input, expect, 290))
+
+    def test_none_association_on_float_eq(self):
+        input = """
+        Function: main
+            Body:
+                a = 1 =/= 2 == 4;
+            EndBody.
+        """
+        expect = "Error on line 4 col 28: =="
+        self.assertTrue(TestParser.checkParser(input, expect, 291))
+
+    def test_array_literal_as_operand(self):
+        input = """
+        Function: main
+            Body:
+                foo = {123, 435, 423} * foo;
+            EndBody.
+        """
+        expect = "successful"
+        self.assertTrue(TestParser.checkParser(input, expect, 292))
+
+    def test_empty_aray_literal(self):
+        input = """
+        Function: main
+            Body:
+                a = {};
+            EndBody.
+        """
+        expect = "Error on line 4 col 21: }"
+        self.assertTrue(TestParser.checkParser(input, expect, 293))
+
+    def test_define_parameter_empty(self):
+        input = """
+        Function: main
+            Parameter:
+            Body:
+            EndBody.
+        """
+        expect = "Error on line 4 col 12: Body"
+        self.assertTrue(TestParser.checkParser(input, expect, 294))
+
+    def test_if_stmt_no_then(self):
+        input = """
+        Function: main
+            Body: 
+                If True EndIf.
+            EndBody.
+        """
+        expect = "Error on line 4 col 24: EndIf"
+        self.assertTrue(TestParser.checkParser(input, expect, 295))
+
+    def test_while_stmt_no_do(self):
+        input = """
+        Function: main
+            Body:
+                While False || (i == 2) EndWhile.
+            EndBody.
+        """
+        expect = "Error on line 4 col 16: While"
+        self.assertTrue(TestParser.checkParser(input, expect, 296))
+
+    def test_do_while_stmt_no_while(self):
+        input = """
+        Function: main
+            Body:
+                Do i = i + 2; EndDo.
+            EndBody.
+        """
+        expect = "Error on line 4 col 30: EndDo"
+        self.assertTrue(TestParser.checkParser(input, expect, 297))
+
+    def test_many_cmts_in_assign_stmt(self):
+        input = """
+        Function: main
+            Body:
+                inp = ppapa[**4235 dasfj dd 44 ** g(-----------**-----**----------------f())];
+            EndBody.
+        """
+        expect = "successful"
+        self.assertTrue(TestParser.checkParser(input, expect, 298))
+
+    def test_for_if_stmt_in_func_decl(self):
+        input = """ 
+        Function: fact
+            Parameter: x, a[2]
+            Body:
+                For (i = 0, i < 10, 2) Do
+                    If x Then Break; EndIf.
+                EndFor.
+                If x Then Break; EndIf.
+            EndBody.
+        """
+        expect = "successful"
+        self.assertTrue(TestParser.checkParser(input, expect, 299))
+
+    def test_init_exp_in_for_stmt_not_scalar_var(self):
+        input = """
+        Function: main
+            Body:
+                For (i, i, i) Do EndFor.
+            EndBody.
+        """
+        expect = "Error on line 4 col 22: ,"
+        self.assertTrue(TestParser.checkParser(input, expect, 300))
 
 
 

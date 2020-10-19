@@ -1,0 +1,6 @@
+
+        Function: main
+            Body:
+                For (a = "str", "str", "Hiiii") Do EndFor.
+            EndBody.
+        

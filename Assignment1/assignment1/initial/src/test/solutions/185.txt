@@ -1,1 +1,1 @@
-Illegal Escape In String: abcABC\n abc'b
+0O1234567,<EOF>

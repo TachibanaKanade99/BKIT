@@ -1,1 +1,1 @@
-*:aBc
+ "ab'"c\n def"  

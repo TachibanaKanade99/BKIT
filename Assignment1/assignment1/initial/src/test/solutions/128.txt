@@ -1,1 +1,1 @@
-a,==,Error Token B
+This is a string: **This is a comment* ,<EOF>

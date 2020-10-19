@@ -1,1 +1,1 @@
-123,abc,*,*,abc,<EOF>
+Error Token E

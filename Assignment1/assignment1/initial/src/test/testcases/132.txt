@@ -1,1 +1,1 @@
-a <. >.
+"This is a string: \r"12340x1230o123

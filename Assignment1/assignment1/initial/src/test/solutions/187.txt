@@ -1,1 +1,1 @@
-Illegal Escape In String: abc\1
+1810.198,<EOF>

@@ -1,1 +1,1 @@
-0,o,0,Error Token O
+<,html,class,=,client-nojs,lang,=,en,dir,=,ltr,<,head,>,<,meta,charset,=,UTF-8,Error Token /

@@ -1,1 +1,2 @@
-199
+**Hello Var Id{} \t 	 f world
+                                              **"This is a string: '"He told me\'"\r"123 123e120X123

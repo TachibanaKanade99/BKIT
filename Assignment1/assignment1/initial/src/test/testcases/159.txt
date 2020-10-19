@@ -1,1 +1,7 @@
- "abc'abc" 
+Function: mainBody: 
+Var: a[1][2];
+ a[1][2] = a > 4+!a;
+ a[1]=!!a>4;
+ z=  a*b+c;
+ res = 2 * ( a + b );
+ EndBody.

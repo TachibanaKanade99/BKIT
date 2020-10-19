@@ -1,1 +1,1 @@
-0,x,0,Error Token X
+U9ExX2MmDm,1231412123,operands,roger,roger,>,>,<,!,rr,Illegal Escape In String: LCK\ 

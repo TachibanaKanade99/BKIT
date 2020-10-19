@@ -1,1 +1,1 @@
-Unterminated Comment
+Do,exercise,(,),;,diet,(,),;,While,(,!,handsome,),EndDo,.,<EOF>

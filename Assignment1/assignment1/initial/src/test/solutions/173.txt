@@ -1,1 +1,1 @@
-{,1,,,2,,,},<EOF>
+Test double quote:\n '" \',<EOF>

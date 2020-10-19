@@ -1,1 +1,1 @@
-a,=/=,<EOF>
+This is a string: \r,1234,<EOF>

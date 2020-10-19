@@ -1,1 +1,1 @@
-12.0e3,<EOF>
+This is the first string!\n,This is the '"2^!@#$%^&*'",<EOF>

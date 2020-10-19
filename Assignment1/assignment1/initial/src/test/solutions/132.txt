@@ -1,1 +1,1 @@
-a,<.,>.,<EOF>
+This is a string: \r,12340,x1230o123,<EOF>

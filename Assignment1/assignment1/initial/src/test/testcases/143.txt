@@ -1,1 +1,2 @@
-0XABC
+123 123e120o123**Hello Var Id{} \t 	 f world"
+                                              "**"This is a string: '"He told me\'"\r

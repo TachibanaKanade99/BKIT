@@ -1,1 +1,1 @@
-abcABC,Unclosed String: abc 
+0x123ABCD,<EOF>

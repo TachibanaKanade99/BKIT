@@ -1,1 +1,1 @@
-*,:,aBc,<EOF>
+ab'"c\n def,<EOF>

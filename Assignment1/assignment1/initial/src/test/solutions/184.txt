@@ -1,1 +1,1 @@
-Illegal Escape In String: abc\"
+0x123ABC,Error Token X

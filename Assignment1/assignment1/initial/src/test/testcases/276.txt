@@ -1,0 +1,7 @@
+
+        Function: main
+            Body:
+                Var: a[2] = {10, {20, 30}};
+                b = b *. c \. 0O77;
+            EndBody.
+        

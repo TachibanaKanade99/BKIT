@@ -1,1 +1,1 @@
-< = <=
+"This is a string: \t 12e6 **This is a comment** "

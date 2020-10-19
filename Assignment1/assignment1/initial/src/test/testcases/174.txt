@@ -1,1 +1,1 @@
- "ABC"ABC 
+"Test double quote:\n '\" \'"

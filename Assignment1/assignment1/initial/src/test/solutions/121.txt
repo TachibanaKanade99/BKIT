@@ -1,1 +1,1 @@
-a,+.,b,<EOF>
+Test double quote: '" \',<EOF>
