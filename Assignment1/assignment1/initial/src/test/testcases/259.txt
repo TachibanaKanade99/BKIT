@@ -2,5 +2,6 @@
         Function: main
             Body:
                 If i == i + 2 || (i == i - 2) Then Return 1;
+                EndIf.
             EndBody.
         

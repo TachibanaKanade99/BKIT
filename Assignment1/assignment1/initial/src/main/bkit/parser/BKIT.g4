@@ -83,8 +83,9 @@ operand_3: operand_3 (MUL | FLOAT_MUL | DIV | FLOAT_DIV | MOD) operand_4 | opera
 operand_4: NOT operand_4 | operand_5;
 operand_5: (MINUS | FLOAT_MINUS) operand_5 | index_expr;
 
-// Index operators:
+//Index expression:
 index_expr: index_expr index_ops | func_call;
+// Index operators:
 index_ops: LSB expr RSB | LSB expr RSB index_ops;
 
 // Function call:
@@ -222,14 +223,14 @@ fragment EXPONENT_PART: [Ee] [+-]? DIGIT+;
 FLOAT_LIT: INT DECIMAL_PART? EXPONENT_PART | INT DECIMAL_PART EXPONENT_PART?;
 
 // Boolean Literal:
-BOOL_LIT: TRUE | FALSE;
+bool_lit: TRUE | FALSE;
 
 // String Literals:
 fragment ESCAPE_QUOTE: '\'' '"';
 fragment ESCAPE_CHAR: '\\' [bfrnt'\\]; 
 STRING_LIT: '"' ( ~['"\b\f\r\n\t\\] | ESCAPE_CHAR | ESCAPE_QUOTE )* '"' {self.text = self.text[1:-1]};
 
-lit: INT_LIT | FLOAT_LIT | BOOL_LIT | STRING_LIT | array_lit;
+lit: INT_LIT | FLOAT_LIT | STRING_LIT | bool_lit | array_lit;
 
 // Array Literals:
 array_lit: LB lit_list RB;

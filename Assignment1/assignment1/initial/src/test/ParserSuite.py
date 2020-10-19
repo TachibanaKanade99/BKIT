@@ -636,6 +636,7 @@ class ParserSuite(unittest.TestCase):
         Function: main
             Body:
                 If i == i + 2 || (i == i - 2) Then Return 1;
+                EndIf.
             EndBody.
         """
         expect = "successful"
@@ -645,13 +646,39 @@ class ParserSuite(unittest.TestCase):
         input = """
         Function: main
             Body:
-                If True Then 2 - 3 == 1 Else 2 - 3 == 2 Else 2 - 3 == 3;
+                If True Then i = 2 - 3 == 1; Else i = 2 - 3 == 2 Else i = 2 - 3 == 3;
+                EndIf.
+            EndBody.
+        """
+        expect = "Error on line 4 col 65: Else"
+        self.assertTrue(TestParser.checkParser(input, expect, 260))
+
+    def test_arr_decl(self):
+        input = """
+        Var: a[2] = {1, {1, 2}};
+        """
+        expect = "successful"
+        self.assertTrue(TestParser.checkParser(input, expect, 261))
+
+    def test_exp_is_lit(self):
+        input = """
+        Function: main
+            Body:
+                While False Do print(i); EndWhile.
             EndBody.
         """
         expect = "successful"
-        self.assertTrue(TestParser.checkParser(input, expect, 260))
+        self.assertTrue(TestParser.checkParser(input, expect, 262))
 
-
+    def test_wrong_scalar_variable_in_for_stmt(self):
+        input = """
+        Function: main
+            Body:    
+                For (a[2] = i + 1, i < 2, i + 1) Do j = i; EndFor.
+            EndBody.
+        """
+        expect = "Error on line 4 col 22: ["
+        self.assertTrue(TestParser.checkParser(input, expect, 263))
 
 
 
