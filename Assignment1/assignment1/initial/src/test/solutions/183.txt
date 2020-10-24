@@ -1,1 +1,1 @@
-0x123ABCD,<EOF>
+<EOF>

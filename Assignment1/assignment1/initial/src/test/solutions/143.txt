@@ -1,1 +1,1 @@
-123,123e120,o123,This is a string: '"He told me\',\,r,<EOF>
+89,*,6,\,a,<EOF>

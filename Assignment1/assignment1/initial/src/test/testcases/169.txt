@@ -1,2 +1,1 @@
-<html class="client-nojs" lang="en" dir="ltr" <head>
-                                              <meta charset="UTF-8"/> <title>Asphalt Wiki | Fandom</title> <script>
+ "hello" 

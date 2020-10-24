@@ -737,7 +737,7 @@ class ParserSuite(unittest.TestCase):
                 Var: a = 012.3;
             EndBody.
         """
-        expect = "Error on line 4 col 26: 12.3"
+        expect = "successful"
         self.assertTrue(TestParser.checkParser(input, expect, 269))
 
     def test_int_lit_with_assign_stmt(self):

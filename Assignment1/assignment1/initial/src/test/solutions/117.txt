@@ -1,1 +1,1 @@
-This is 2st case quack\tWhat does the fox say? ,<EOF>
+a8,<EOF>

@@ -232,7 +232,7 @@ class LexerSuite(unittest.TestCase):
         self.assertTrue(TestLexer.checkLexeme("12.", "12.,<EOF>", 163))
 
     def test_zero_and_float_number(self):
-        self.assertTrue(TestLexer.checkLexeme("021.3", "0,21.3,<EOF>", 164))
+        self.assertTrue(TestLexer.checkLexeme("021.3", "021.3,<EOF>", 164))
 
     def test_float_number_with_positive_sign_exp(self):
         self.assertTrue(TestLexer.checkLexeme("12.3e+3", "12.3e+3,<EOF>", 165))
@@ -341,7 +341,7 @@ class LexerSuite(unittest.TestCase):
         self.assertTrue(TestLexer.checkLexeme(""" "ABCabc   " """, """ABCabc   ,<EOF>""", 194))
 
     def test_zero_at_start_of_floatlit(self):
-        self.assertTrue(TestLexer.checkLexeme("012.012e-03", "0,12.012e-03,<EOF>", 195))
+        self.assertTrue(TestLexer.checkLexeme("012.012e-03", "012.012e-03,<EOF>", 195))
 
     def test_zero_in_exponent_floatlit(self):
         self.assertTrue(TestLexer.checkLexeme("12.0e-000012", "12.0e-000012,<EOF>", 196))
@@ -357,9 +357,6 @@ class LexerSuite(unittest.TestCase):
 
     def test_zero_in_int_part(self):
         self.assertTrue(TestLexer.checkLexeme("0.12e-3", "0.12e-3,<EOF>", 200))
-
-
-
 
 
 

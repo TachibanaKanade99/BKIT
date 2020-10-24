@@ -1,4 +1,1 @@
-While (weight >=.70.5e0) Do 
-	exercise();
-	diet();
-EndWhile.
+89  *. 6 \.   a

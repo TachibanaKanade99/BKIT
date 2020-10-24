@@ -1,1 +1,1 @@
- this is a string: '"abc\nxyz'",<EOF>
+5.9,6.8,<EOF>

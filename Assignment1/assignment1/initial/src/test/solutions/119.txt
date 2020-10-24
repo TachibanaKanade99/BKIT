@@ -1,1 +1,1 @@
-Testallsupportescapesequencesnospace:\b\f\r\n\t\'\\,<EOF>
+auy8lo,<EOF>

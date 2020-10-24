@@ -1,1 +1,1 @@
-Illegal Escape In String: OoinarU\t kibou\z
+,,,<EOF>

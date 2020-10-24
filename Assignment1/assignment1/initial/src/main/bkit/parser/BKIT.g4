@@ -220,7 +220,7 @@ INT_LIT: INT | HEXA_DEC | OCTAL;
 // Float Literal:
 fragment DECIMAL_PART: '.' DIGIT*;
 fragment EXPONENT_PART: [Ee] [+-]? DIGIT+;
-FLOAT_LIT: INT DECIMAL_PART? EXPONENT_PART | INT DECIMAL_PART EXPONENT_PART?;
+FLOAT_LIT: DIGIT+ DECIMAL_PART? EXPONENT_PART | DIGIT+ DECIMAL_PART EXPONENT_PART?;
 
 // Boolean Literal:
 bool_lit: TRUE | FALSE;
@@ -242,4 +242,4 @@ many_lits: COMMA lit many_lits | ;
 ERROR_CHAR: .;
 UNCLOSE_STRING: '"' ( ~['"\b\f\r\n\t\\] | ESCAPE_CHAR | ESCAPE_QUOTE )* {self.text = self.text[1:]};
 ILLEGAL_ESCAPE: '"' ( ~['"\b\f\r\n\t\\] | ESCAPE_CHAR | ESCAPE_QUOTE )* ('\\' ~[bfrnt'\\] | '\'' ~["] ) {self.text = self.text[1:]};
-UNTERMINATED_COMMENT: '**' .*?;
+UNTERMINATED_COMMENT: '**' .?;

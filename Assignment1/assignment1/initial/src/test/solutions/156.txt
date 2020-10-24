@@ -1,1 +1,1 @@
-Illegal Escape In String: AnnaToYukiNoOu\u
+5,>,Error Token #

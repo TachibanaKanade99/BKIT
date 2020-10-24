@@ -1,1 +1,1 @@
-abc xyz , abc \n xyz ,<EOF>
+-,5.6,<EOF>

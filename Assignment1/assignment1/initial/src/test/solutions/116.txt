@@ -1,1 +1,1 @@
-This is 1st case wan wan ,<EOF>
+2,6,84,<EOF>

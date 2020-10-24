@@ -1,1 +1,1 @@
-Kira Kira a la mode!\n,Franciso '"!@#$%^&*'",Unclosed String: Wut!
+Illegal Escape In String: abc\h

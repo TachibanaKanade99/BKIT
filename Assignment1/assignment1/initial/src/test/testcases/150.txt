@@ -1,5 +1,1 @@
-Do 
-	exercise();
-	diet();
-While (!handsome)
-EndDo.
+as+._

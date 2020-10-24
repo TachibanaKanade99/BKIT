@@ -1,1 +1,1 @@
-"Test double quote:\n '\" \'"
+ "er\yui" 
