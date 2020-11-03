@@ -1,1 +1,1 @@
-er,>,p,<EOF>
+abc\t,<EOF>

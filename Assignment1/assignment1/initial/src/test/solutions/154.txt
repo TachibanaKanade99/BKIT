@@ -1,1 +1,1 @@
-ty,>,8,!=,59,<EOF>
+ABCabc123ABC,<EOF>

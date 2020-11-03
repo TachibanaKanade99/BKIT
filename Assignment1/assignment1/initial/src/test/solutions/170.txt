@@ -1,1 +1,1 @@
-MEGA,<EOF>
+ElseIf,If,EndIf,<EOF>

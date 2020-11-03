@@ -1,1 +1,1 @@
-5,>,Error Token #
+12.0e3,<EOF>

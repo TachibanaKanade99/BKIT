@@ -1,1 +1,1 @@
-a,+,i,Error Token $
+012.012e-03,<EOF>

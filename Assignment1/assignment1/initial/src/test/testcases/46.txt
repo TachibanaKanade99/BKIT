@@ -1,7 +1,0 @@
-
-        Function: foo
-            Body:
-                x = 10;
-                ok();
-            EndBody.
-        

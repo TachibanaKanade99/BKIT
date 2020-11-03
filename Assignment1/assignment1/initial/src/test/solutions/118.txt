@@ -1,1 +1,1 @@
-a85789,<EOF>
+Var,a,Error Token A

@@ -1,1 +1,1 @@
-hello,<EOF>
+0,o,0,Error Token O

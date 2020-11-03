@@ -1,4 +1,0 @@
-
-        value = "string nay la value;
-        value2 = "string string string";
-        

@@ -1,1 +1,1 @@
-Error Token Y
+abc123,<EOF>

@@ -159,8 +159,8 @@ class BKITVisitor(ParseTreeVisitor):
         return self.visitChildren(ctx)
 
 
-    # Visit a parse tree produced by BKITParser#operand_6.
-    def visitOperand_6(self, ctx:BKITParser.Operand_6Context):
+    # Visit a parse tree produced by BKITParser#index_expr.
+    def visitIndex_expr(self, ctx:BKITParser.Index_exprContext):
         return self.visitChildren(ctx)
 
 
@@ -169,8 +169,13 @@ class BKITVisitor(ParseTreeVisitor):
         return self.visitChildren(ctx)
 
 
-    # Visit a parse tree produced by BKITParser#operand_7.
-    def visitOperand_7(self, ctx:BKITParser.Operand_7Context):
+    # Visit a parse tree produced by BKITParser#func_call.
+    def visitFunc_call(self, ctx:BKITParser.Func_callContext):
+        return self.visitChildren(ctx)
+
+
+    # Visit a parse tree produced by BKITParser#operand.
+    def visitOperand(self, ctx:BKITParser.OperandContext):
         return self.visitChildren(ctx)
 
 
@@ -266,6 +271,11 @@ class BKITVisitor(ParseTreeVisitor):
 
     # Visit a parse tree produced by BKITParser#return_stmt.
     def visitReturn_stmt(self, ctx:BKITParser.Return_stmtContext):
+        return self.visitChildren(ctx)
+
+
+    # Visit a parse tree produced by BKITParser#bool_lit.
+    def visitBool_lit(self, ctx:BKITParser.Bool_litContext):
         return self.visitChildren(ctx)
 
 

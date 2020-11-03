@@ -1,1 +1,1 @@
-ty,>,9,<EOF>
+abc\'123\nABC,<EOF>
