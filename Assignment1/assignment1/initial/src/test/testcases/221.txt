@@ -1,6 +1,0 @@
-
-        Function: main
-            Body:
-                a = i < 20 && (j == i + 1);
-            EndBody.
-        

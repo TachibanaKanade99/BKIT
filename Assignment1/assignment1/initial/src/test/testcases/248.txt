@@ -1,7 +1,0 @@
-
-        Function: main
-            Body:
-                a[m + 1][n \. 1][1232132] [j] = c[i[20 \. 1] + 1];
-                Var: a = 203;
-            EndBody.
-        

@@ -1,6 +1,0 @@
-
-        Function: main
-            Body:
-                While i - 2 Do EndWhile.
-            EndBody.
-        

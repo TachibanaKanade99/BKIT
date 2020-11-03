@@ -1,6 +1,0 @@
-
-        Function: main
-            Body:
-                While (i < 0) Do i = i - 1; EndWhile.
-            EndBody.
-        

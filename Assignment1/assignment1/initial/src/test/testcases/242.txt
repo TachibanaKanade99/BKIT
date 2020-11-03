@@ -1,6 +1,0 @@
-
-        Function: main
-            Body:
-                Var: a = { ** This is comment ** 1 };
-            EndBody.
-        

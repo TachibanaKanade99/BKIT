@@ -1,8 +1,0 @@
-
-        Function: main
-            Body:
-                For (a = 0, a < 10, a + 1) Do
-                    b = a;
-                EndFor.
-            EndBody.
-        

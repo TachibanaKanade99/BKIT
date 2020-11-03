@@ -1,7 +1,0 @@
-
-        Function: main
-            Body:
-                a = (1 == (a <= b || (abc - 45)));
-                a = -b + -.c;
-            EndBody.
-        

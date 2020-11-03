@@ -1,6 +1,0 @@
-
-        Var: a = 5;
-        Function: main
-            Body:
-            EndBody.
-        

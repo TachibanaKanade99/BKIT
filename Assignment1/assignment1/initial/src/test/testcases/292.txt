@@ -1,6 +1,0 @@
-
-        Function: main
-            Body:
-                foo = {123, 435, 423} * foo;
-            EndBody.
-        

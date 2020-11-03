@@ -1,6 +1,0 @@
-
-        Function: foo
-            Parameter: a, {1, {1, 2}}
-            Body:
-            EndBody.
-        

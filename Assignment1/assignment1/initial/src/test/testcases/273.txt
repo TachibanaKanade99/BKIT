@@ -1,8 +1,0 @@
-
-                Function: main
-                    Body: 
-                        If {1} Then Return True;
-                        Else If "Hey this is string \n\t" + "True" Then Return False; EndIf.
-                        EndIf.
-                    EndBody.
-                

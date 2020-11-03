@@ -1,6 +1,0 @@
-
-        Function: main
-            Body:
-                Do i = i + 2; EndDo.
-            EndBody.
-        

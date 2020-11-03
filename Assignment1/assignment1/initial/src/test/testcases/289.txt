@@ -1,6 +1,0 @@
-
-        Function: main
-            Body:
-                Var: a[i] = 10;
-            EndBody.
-        

@@ -1,6 +1,0 @@
-
-        Function: main
-            Body:
-                a[3 + foo(2)][i[1][23 + i] + 10] = 20;
-            EndBody.
-        
