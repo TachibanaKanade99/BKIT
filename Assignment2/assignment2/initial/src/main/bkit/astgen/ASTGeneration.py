@@ -6,7 +6,7 @@ class ASTGeneration(BKITVisitor):
 
     # program: many_declars EOF;
     def visitProgram(self, ctx):
-        return ctx.many_declars().accept(self)
+        return Program(ctx.many_declars().accept(self))
 
     # many_declars: global_var_declar_lst func_declar_lst;
     def visitMany_declars(self, ctx):
@@ -32,7 +32,10 @@ class ASTGeneration(BKITVisitor):
         variable_lst = ctx.var_lst().accept(self)
 
         for variable in variable_lst:
-            print(variable[0], " ", variable[1], " ", variable[2])
+            # variable[0] : ID
+            # variable[1] : dimension
+            # varialbe[2] : initial_value
+            
             decl_lst.append(VarDecl(variable[0], variable[1], variable[2]))
 
         return decl_lst
