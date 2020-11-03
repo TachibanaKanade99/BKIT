@@ -223,6 +223,7 @@ fragment EXPONENT_PART: [Ee] [+-]? DIGIT+;
 FLOAT_LIT: DIGIT+ DECIMAL_PART? EXPONENT_PART | DIGIT+ DECIMAL_PART EXPONENT_PART?;
 
 // Boolean Literal:
+// Defined:
 bool_lit: TRUE | FALSE;
 
 // String Literals:
@@ -230,9 +231,11 @@ fragment ESCAPE_QUOTE: '\'' '"';
 fragment ESCAPE_CHAR: '\\' [bfrnt'\\]; 
 STRING_LIT: '"' ( ~['"\b\f\r\n\t\\] | ESCAPE_CHAR | ESCAPE_QUOTE )* '"' {self.text = self.text[1:-1]};
 
+// Defined:
 lit: INT_LIT | FLOAT_LIT | STRING_LIT | bool_lit | array_lit;
 
 // Array Literals:
+// Defined:
 array_lit: LB lit_list RB;
 lit_list: lit many_lits;
 many_lits: COMMA lit many_lits | ;

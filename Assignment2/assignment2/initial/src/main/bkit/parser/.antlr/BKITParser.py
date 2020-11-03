@@ -1,4 +1,4 @@
-# Generated from d:\Tuan_Minh\HK201\PPL\BKIT\Assignment2\assignment2\initial\src\main\bkit\parser\BKIT.g4 by ANTLR 4.8
+# Generated from /media/tuanminh/DATA/Tuan_Minh/HK201/PPL/BKIT/Assignment2/assignment2/initial/src/main/bkit/parser/BKIT.g4 by ANTLR 4.8
 # encoding: utf-8
 from antlr4 import *
 from io import StringIO
