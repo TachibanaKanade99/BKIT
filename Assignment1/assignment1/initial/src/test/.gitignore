@@ -2,3 +2,10 @@ __pycache__/
 .DS_Store
 solutions/
 testcases/
+
+LexerSuite1.py
+LexerSuite2.py
+LexerSuite_TA.py
+ParserSuite_HM.py
+ParserSuite_Ho.py
+ParserSuite_TA.py
