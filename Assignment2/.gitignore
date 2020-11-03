@@ -2,3 +2,6 @@
 __MACOSX/
 
 assignment2.zip
+solutions/
+testcases/
+__pycache__/
