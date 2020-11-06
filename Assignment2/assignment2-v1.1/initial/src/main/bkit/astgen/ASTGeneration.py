@@ -419,6 +419,77 @@ class ASTGeneration(BKITVisitor):
         else:
             return []
 
-    
+    # for_stmt: FOR LP ID ASSIGN expr COMMA expr COMMA expr RP DO stmt_lst ENDFOR DOT;
+    def visitFor_stmt(self, ctx):
+        stmts = ctx.stmt_lst().accept(self)
+        vardecl_lst = []
+        stmt_lst = []
 
+        for stmt in stmts:
+            if isinstance(stmt, VarDecl):
+                vardecl_lst.append(stmt)
+            else:
+                stmt_lst.append(stmt)
+
+        return For(Id(ctx.ID().getText(), ctx.expr(0).accept(self), ctx.expr(1).accept(self), ctx.expr(2).accept(self), (vardecl_lst, stmt_lst)))
+
+    # while_stmt: WHILE expr DO stmt_lst ENDWHILE DOT;
+    def visitWhile_stmt(self, ctx):
+        stmts = ctx.stmt_lst().accept(self)
+        vardecl_lst = []
+        stmt_lst = []
+
+        for stmt in stmts:
+            if isinstance(stmt, VarDecl):
+                vardecl_lst.append(stmt)
+            else:
+                stmt_lst.append(stmt)
+
+        return While(ctx.expr().accept(self), (vardecl_lst, stmt_lst))
+
+    # do_while_stmt: DO stmt_lst WHILE expr ENDDO DOT;
+    def visitDo_while_stmt(self, ctx):
+        stmts = ctx.stmt_lst().accept(self)
+        vardecl_lst = []
+        stmt_lst = []
+
+        for stmt in stmts:
+            if isinstance(stmt, VarDecl):
+                vardecl_lst.append(stmt)
+            else:
+                stmt_lst.append(stmt)
         
+        return Dowhile((vardecl_lst, stmt_lst), ctx.expr().accept(self))
+
+    # break_stmt: BREAK SEMI;
+    def visitBreak_stmt(self, ctx):
+        return Break()
+
+    # continue_stmt: CONTINUE SEMI;
+    def visitContinue_stmt(self, ctx):
+        return Continue()
+
+    # call_stmt: ID LP expr_lst RP SEMI;
+    def visitCall_stmt(self, ctx):
+        return CallStmt(Id(ctx.ID().getText()), ctx.expr_lst().accept(self))
+
+    # expr_lst: expr many_exprs | ;
+    def visitExpr_lst(self, ctx):
+        if ctx.getChildCount() == 2:
+            return [ctx.expr().accept(self)] + ctx.many_exprs().accept(self)
+        else:
+            return []
+
+    # many_exprs: COMMA expr many_exprs | ;
+    def visitMany_exprs(self, ctx):
+        if ctx.getChildCount() == 3:
+            return [ctx.expr().accept(self)] + ctx.many_exprs().accept(self)
+        else:
+            return []
+
+    # return_stmt: RETURN SEMI | RETURN expr SEMI;
+    def visitReturn_stmt(self, ctx):
+        if ctx.getChildCount() == 2:
+            return Return()
+        else:
+            return Return(ctx.expr().accept(self))
