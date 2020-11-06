@@ -12,7 +12,7 @@ class ASTGenSuite(unittest.TestCase):
         ) 
         self.assertTrue(TestAST.checkASTGen(input, expect, 300))
 
-    def test_simple_dimension_global_var_decl(self):
+    def test_simple_one_dimension_global_var_decl(self):
         input = """Var: a[10];"""
         expect = Program(
             [
