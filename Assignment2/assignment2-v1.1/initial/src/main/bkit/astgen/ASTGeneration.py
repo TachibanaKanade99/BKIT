@@ -122,14 +122,14 @@ class ASTGeneration(BKITVisitor):
     # func_declar_lst: func_decl many_func_decl | ;
     def visitFunc_declar_lst(self, ctx):
         if ctx.getChildCount() == 2:
-            return ctx.func_decl().accept(self) + ctx.many_func_decl().accept(self)
+            return [ctx.func_decl().accept(self)] + ctx.many_func_decl().accept(self)
         else:
             return []
 
     # many_func_decl: func_decl many_func_decl | ;
     def visitMany_func_decl(self, ctx):
         if ctx.getChildCount() == 2:
-            return ctx.func_decl().accept(self) + ctx.many_func_decl().accept(self)
+            return [ctx.func_decl().accept(self)] + ctx.many_func_decl().accept(self)
         else:
             return []
 
@@ -150,12 +150,12 @@ class ASTGeneration(BKITVisitor):
 
     # param_lst: param many_params;
     def visitParam_lst(self, ctx):
-        return ctx.param().accept(self) + ctx.many_params().accept(self)
+        return [ctx.param().accept(self)] + ctx.many_params().accept(self)
 
     # many_params: COMMA param many_params | ;
     def visitMany_params(self, ctx):
         if ctx.getChildCount() == 3:
-            return ctx.param().accept(self) + ctx.many_params().accept(self)
+            return [ctx.param().accept(self)] + ctx.many_params().accept(self)
         else:
             return []
 
@@ -182,14 +182,14 @@ class ASTGeneration(BKITVisitor):
     # stmt_lst: stmt many_stmts | ;
     def visitStmt_lst(self, ctx):
         if ctx.getChildCount() == 2:
-            return ctx.stmt().accept(self) + ctx.many_stmts().accept(self)
+            return [ctx.stmt().accept(self)] + ctx.many_stmts().accept(self)
         else:
             return ()
 
     # many_stmts: stmt many_stmts | ;
     def visitMany_stmts(self, ctx):
         if ctx.getChildCount() == 2:
-            return ctx.stmt().accept(self) + ctx.many_stmts().accept(self)
+            return [ctx.stmt().accept(self)] + ctx.many_stmts().accept(self)
         else:
             return []
 
@@ -361,5 +361,64 @@ class ASTGeneration(BKITVisitor):
 
     # if_stmt: IF expr THEN stmt_lst elseif_stmt_lst else_stmt ENDIF DOT;
     def visitIf_stmt(self, ctx):
-        
+        ifthen_stmts = []
+        stmts = ctx.stmt_lst().accept(self)
+        vardecl_lst = []
+        stmt_lst = []
+
+        for stmt in stmts:
+            if isinstance(stmt, VarDecl):
+               vardecl_lst.append(stmt)
+            else:
+                stmt_lst.append(stmt)
+
+        ifthen_stmts.append((ctx.expr().accept(self), vardecl_lst, stmt_lst))
+
+        return If(ifthen_stmts + ctx.elseif_stmt_lst().accept(self), ctx.else_stmt().accept(self))
+
+    # elseif_stmt_lst: elseif_stmt many_elseif_stmts | ;
+    def visitElseif_stmt_lst(self, ctx):
+        if ctx.getChildCount() == 2:
+            return [ctx.elseif_stmt().accept(self)] + ctx.many_elseif_stmts().accept(self)
+        else:
+            return []
+
+    # many_elseif_stmts: elseif_stmt many_elseif_stmts | ;
+    def visitMany_elseif_stmts(self, ctx):
+        if ctx.getChildCount() == 2:
+            return [ctx.elseif_stmt().accept(self)] + ctx.many_elseif_stmts().accept(self)
+        else:
+            return []
+
+    # elseif_stmt: ELSEIF expr THEN stmt_lst;
+    def visitElseif_stmt(self, ctx):
+        stmts = ctx.stmt_lst().accept(self)
+        vardecl_lst = []
+        stmt_lst = []
+
+        for stmt in stmts:
+            if isinstance(stmt, VarDecl):
+               vardecl_lst.append(stmt)
+            else:
+                stmt_lst.append(stmt)
+        return (ctx.expr().accept(self), vardecl_lst, stmt_lst)
+
+    # else_stmt: ELSE stmt_lst | ;
+    def visitElse_stmt(self, ctx):
+        if ctx.getChildCount() == 2:
+            stmts = ctx.stmt_lst().accept(self)
+            vardecl_lst = []
+            stmt_lst = []
+
+            for stmt in stmts:
+                if isinstance(stmt, VarDecl):
+                    vardecl_lst.append(stmt)
+                else:
+                    stmt_lst.append(stmt)
+            return (vardecl_lst, stmt_lst)
+        else:
+            return []
+
+    
+
         

@@ -20,4 +20,42 @@ class ASTGenSuite(unittest.TestCase):
             ]
         )
         self.assertTrue(TestAST.checkASTGen(input, expect, 301))
+
+    def test_simple_if_stmt(self):
+        input = """
+        Function: main
+            Body:
+                If i < 2 Then i = i + 1;
+                EndIf.
+            EndBody.
+        """
+        expect = Program(
+            [
+                FuncDecl(
+                    Id("main"),
+                    [],
+                    (
+                        [],
+                        [
+                            If(
+                                [
+                                    (
+                                        BinaryOp("<",Id("i"),IntLiteral(2)),
+                                        [],
+                                        [
+                                            Assign(
+                                                Id("i"),
+                                                BinaryOp("+",Id("i"),IntLiteral(1))
+                                            )
+                                        ]
+                                    )
+                                ],
+                                []    
+                            )
+                        ]
+                    )
+                )
+            ])
+        self.assertTrue(TestAST.checkASTGen(input, expect, 302))
+
    
