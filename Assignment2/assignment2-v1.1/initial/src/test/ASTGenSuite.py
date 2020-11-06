@@ -58,4 +58,41 @@ class ASTGenSuite(unittest.TestCase):
             ])
         self.assertTrue(TestAST.checkASTGen(input, expect, 302))
 
-   
+    def test_simple_multi_dimension_global_var_decl(self):
+        input = """Var: a[10][20];"""
+        expect = Program(
+            [
+                VarDecl(Id("a"), [IntLiteral(10), IntLiteral(20)], None)
+            ]
+        )
+        self.assertTrue(TestAST.checkASTGen(input, expect, 303))
+
+    def test_multiple_global_var_decl(self):
+        input = """Var: a, b[10];"""
+        expect = Program(
+            [
+                VarDecl(Id("a"), [], None),
+                VarDecl(Id("b"), [IntLiteral(10)], None)
+            ]
+        )
+        self.assertTrue(TestAST.checkASTGen(input, expect, 304))
+
+    def test_global_var_decl_with_initial_val(self):
+        input = """Var: a = 10;"""
+        expect = Program(
+            [
+                VarDecl(Id("a"), [], IntLiteral(10))
+            ]
+        )
+        self.assertTrue(TestAST.checkASTGen(input, expect, 305))
+    
+    def test_multiple_global_var_decl_with_initial_val(self):
+        input = """Var: a = 12e-3, b[10];"""
+        expect = Program(
+            [
+                VarDecl(Id("a"), [], FloatLiteral(0.012)),VarDecl(Id("b"), [IntLiteral(10)], None)
+            ]
+        )
+        self.assertTrue(TestAST.checkASTGen(input, expect, 306))
+
+    
