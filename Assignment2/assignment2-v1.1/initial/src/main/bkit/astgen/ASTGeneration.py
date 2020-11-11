@@ -1,3 +1,5 @@
+# ID:1752595
+
 from BKITVisitor import BKITVisitor
 from BKITParser import BKITParser
 from AST import *
@@ -76,7 +78,7 @@ class ASTGeneration(BKITVisitor):
         elif ctx.bool_lit():
             return BooleanLiteral(ctx.bool_lit().accept(self))
         else:
-            return ArrayLiteral(ctx.array_lit().accept(self))
+            return ctx.array_lit().accept(self)
 
     # bool_lit: TRUE | FALSE;
     def visitBool_lit(self, ctx):
@@ -87,7 +89,7 @@ class ASTGeneration(BKITVisitor):
 
     # array_lit: LB lit_list RB;
     def visitArray_lit(self, ctx):
-        return ctx.lit_list().accept(self)
+        return ArrayLiteral(ctx.lit_list().accept(self))
 
     # lit_list: lit many_lits;
     def visitLit_list(self, ctx):
@@ -168,23 +170,18 @@ class ASTGeneration(BKITVisitor):
 
     # body: BODY COLON stmt_lst ENDBODY DOT;
     def visitBody(self, ctx):
-        stmts = ctx.stmt_lst().accept(self)
-        vardecl_lst = []
-        stmt_lst = []
+        return ctx.stmt_lst().accept(self)
 
-        for stmt in stmts:
-            if isinstance(stmt, VarDecl):
-               vardecl_lst.append(stmt)
-            else:
-                stmt_lst.append(stmt) 
-        return (vardecl_lst, stmt_lst)
-
-    # stmt_lst: stmt many_stmts | ;
+    # stmt_lst: global_var_declar_lst other_stmt_lst;
     def visitStmt_lst(self, ctx):
+        return (ctx.global_var_declar_lst().accept(self), ctx.other_stmt_lst().accept(self))
+
+    # other_stmt_lst: stmt many_stmts | ;
+    def visitOther_stmt_lst(self, ctx):
         if ctx.getChildCount() == 2:
             return [ctx.stmt().accept(self)] + ctx.many_stmts().accept(self)
         else:
-            return ()
+            return []
 
     # many_stmts: stmt many_stmts | ;
     def visitMany_stmts(self, ctx):
@@ -329,11 +326,9 @@ class ASTGeneration(BKITVisitor):
     def visitArgument(self, ctx):
         return ctx.expr().accept(self)
 
-    # stmt: var_decl | assign_stmt | if_stmt | for_stmt | while_stmt | do_while_stmt | break_stmt | continue_stmt | call_stmt | return_stmt;
+    # stmt: assign_stmt | if_stmt | for_stmt | while_stmt | do_while_stmt | break_stmt | continue_stmt | call_stmt | return_stmt;
     def visitStmt(self, ctx):
-        if ctx.var_decl():
-            return ctx.var_decl().accept(self)
-        elif ctx.assign_stmt():
+        if ctx.assign_stmt():
             return ctx.assign_stmt().accept(self)
         elif ctx.if_stmt():
             return ctx.if_stmt().accept(self)
@@ -357,20 +352,14 @@ class ASTGeneration(BKITVisitor):
         if ctx.ID():
             return Assign(Id(ctx.ID().getText()), ctx.expr().accept(self))
         else:
-            return Assign(ctx.index_expr().accept(sef), ctx.expr().accept(self))
+            return Assign(ctx.index_expr().accept(self), ctx.expr().accept(self))
 
     # if_stmt: IF expr THEN stmt_lst elseif_stmt_lst else_stmt ENDIF DOT;
     def visitIf_stmt(self, ctx):
         ifthen_stmts = []
         stmts = ctx.stmt_lst().accept(self)
-        vardecl_lst = []
-        stmt_lst = []
-
-        for stmt in stmts:
-            if isinstance(stmt, VarDecl):
-               vardecl_lst.append(stmt)
-            else:
-                stmt_lst.append(stmt)
+        vardecl_lst = stmts[0]
+        stmt_lst = stmts[1]
 
         ifthen_stmts.append((ctx.expr().accept(self), vardecl_lst, stmt_lst))
 
@@ -393,28 +382,18 @@ class ASTGeneration(BKITVisitor):
     # elseif_stmt: ELSEIF expr THEN stmt_lst;
     def visitElseif_stmt(self, ctx):
         stmts = ctx.stmt_lst().accept(self)
-        vardecl_lst = []
-        stmt_lst = []
+        vardecl_lst = stmts[0]
+        stmt_lst = stmts[1]
 
-        for stmt in stmts:
-            if isinstance(stmt, VarDecl):
-               vardecl_lst.append(stmt)
-            else:
-                stmt_lst.append(stmt)
         return (ctx.expr().accept(self), vardecl_lst, stmt_lst)
 
     # else_stmt: ELSE stmt_lst | ;
     def visitElse_stmt(self, ctx):
         if ctx.getChildCount() == 2:
             stmts = ctx.stmt_lst().accept(self)
-            vardecl_lst = []
-            stmt_lst = []
+            vardecl_lst = stmts[0]
+            stmt_lst = stmts[1]
 
-            for stmt in stmts:
-                if isinstance(stmt, VarDecl):
-                    vardecl_lst.append(stmt)
-                else:
-                    stmt_lst.append(stmt)
             return (vardecl_lst, stmt_lst)
         else:
             return []
@@ -422,43 +401,25 @@ class ASTGeneration(BKITVisitor):
     # for_stmt: FOR LP ID ASSIGN expr COMMA expr COMMA expr RP DO stmt_lst ENDFOR DOT;
     def visitFor_stmt(self, ctx):
         stmts = ctx.stmt_lst().accept(self)
-        vardecl_lst = []
-        stmt_lst = []
-
-        for stmt in stmts:
-            if isinstance(stmt, VarDecl):
-                vardecl_lst.append(stmt)
-            else:
-                stmt_lst.append(stmt)
+        vardecl_lst = stmts[0]
+        stmt_lst = stmts[1]
 
         return For(Id(ctx.ID().getText(), ctx.expr(0).accept(self), ctx.expr(1).accept(self), ctx.expr(2).accept(self), (vardecl_lst, stmt_lst)))
 
     # while_stmt: WHILE expr DO stmt_lst ENDWHILE DOT;
     def visitWhile_stmt(self, ctx):
         stmts = ctx.stmt_lst().accept(self)
-        vardecl_lst = []
-        stmt_lst = []
-
-        for stmt in stmts:
-            if isinstance(stmt, VarDecl):
-                vardecl_lst.append(stmt)
-            else:
-                stmt_lst.append(stmt)
+        vardecl_lst = stmts[0]
+        stmt_lst = stmts[1]
 
         return While(ctx.expr().accept(self), (vardecl_lst, stmt_lst))
 
     # do_while_stmt: DO stmt_lst WHILE expr ENDDO DOT;
     def visitDo_while_stmt(self, ctx):
         stmts = ctx.stmt_lst().accept(self)
-        vardecl_lst = []
-        stmt_lst = []
+        vardecl_lst = stmts[0]
+        stmt_lst = stmts[1]
 
-        for stmt in stmts:
-            if isinstance(stmt, VarDecl):
-                vardecl_lst.append(stmt)
-            else:
-                stmt_lst.append(stmt)
-        
         return Dowhile((vardecl_lst, stmt_lst), ctx.expr().accept(self))
 
     # break_stmt: BREAK SEMI;

@@ -62,7 +62,9 @@ param: ID | composite_var;
 
 // Function Body:
 body: BODY COLON stmt_lst ENDBODY DOT;
-stmt_lst: stmt many_stmts | ;
+
+stmt_lst: global_var_declar_lst other_stmt_lst;
+other_stmt_lst: stmt many_stmts | ;
 many_stmts: stmt many_stmts | ;
 
 // Main function:
@@ -99,7 +101,7 @@ argument: expr;
 
 
 // Statement:
-stmt: var_decl | assign_stmt | if_stmt | for_stmt | while_stmt | do_while_stmt | break_stmt | continue_stmt | call_stmt | return_stmt;
+stmt: assign_stmt | if_stmt | for_stmt | while_stmt | do_while_stmt | break_stmt | continue_stmt | call_stmt | return_stmt;
 
 // Assign Statement:
 assign_stmt: (ID | index_expr) ASSIGN expr SEMI;

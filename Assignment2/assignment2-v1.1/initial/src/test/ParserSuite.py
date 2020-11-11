@@ -531,7 +531,7 @@ class ParserSuite(unittest.TestCase):
                 Var: a = 203;
             EndBody.
         """
-        expect = "successful"
+        expect = "Error on line 5 col 16: Var"
         self.assertTrue(TestParser.checkParser(input, expect, 248))
 
     def test_break_stmt_in_function_decl(self):
@@ -1075,6 +1075,5 @@ class ParserSuite(unittest.TestCase):
         """
         expect = "Error on line 4 col 22: ,"
         self.assertTrue(TestParser.checkParser(input, expect, 300))
-
 
 

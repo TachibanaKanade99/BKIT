@@ -1,4 +1,4 @@
-# Generated from /media/tuanminh/DATA/Tuan_Minh/HK201/PPL/BKIT/Assignment2/assignment2-v1.1/initial/src/main/bkit/parser/BKIT.g4 by ANTLR 4.8
+# Generated from main/bkit/parser/BKIT.g4 by ANTLR 4.8
 # encoding: utf-8
 from antlr4 import *
 from io import StringIO
@@ -436,6 +436,12 @@ class BKITParser ( Parser ):
         def getRuleIndex(self):
             return BKITParser.RULE_program
 
+        def accept(self, visitor:ParseTreeVisitor):
+            if hasattr( visitor, "visitProgram" ):
+                return visitor.visitProgram(self)
+            else:
+                return visitor.visitChildren(self)
+
 
 
 
@@ -475,6 +481,12 @@ class BKITParser ( Parser ):
         def getRuleIndex(self):
             return BKITParser.RULE_many_declars
 
+        def accept(self, visitor:ParseTreeVisitor):
+            if hasattr( visitor, "visitMany_declars" ):
+                return visitor.visitMany_declars(self)
+            else:
+                return visitor.visitChildren(self)
+
 
 
 
@@ -513,6 +525,12 @@ class BKITParser ( Parser ):
 
         def getRuleIndex(self):
             return BKITParser.RULE_global_var_declar_lst
+
+        def accept(self, visitor:ParseTreeVisitor):
+            if hasattr( visitor, "visitGlobal_var_declar_lst" ):
+                return visitor.visitGlobal_var_declar_lst(self)
+            else:
+                return visitor.visitChildren(self)
 
 
 
@@ -564,6 +582,12 @@ class BKITParser ( Parser ):
 
         def getRuleIndex(self):
             return BKITParser.RULE_many_var_decl
+
+        def accept(self, visitor:ParseTreeVisitor):
+            if hasattr( visitor, "visitMany_var_decl" ):
+                return visitor.visitMany_var_decl(self)
+            else:
+                return visitor.visitChildren(self)
 
 
 
@@ -621,6 +645,12 @@ class BKITParser ( Parser ):
         def getRuleIndex(self):
             return BKITParser.RULE_var_decl
 
+        def accept(self, visitor:ParseTreeVisitor):
+            if hasattr( visitor, "visitVar_decl" ):
+                return visitor.visitVar_decl(self)
+            else:
+                return visitor.visitChildren(self)
+
 
 
 
@@ -664,6 +694,12 @@ class BKITParser ( Parser ):
         def getRuleIndex(self):
             return BKITParser.RULE_var_lst
 
+        def accept(self, visitor:ParseTreeVisitor):
+            if hasattr( visitor, "visitVar_lst" ):
+                return visitor.visitVar_lst(self)
+            else:
+                return visitor.visitChildren(self)
+
 
 
 
@@ -705,6 +741,12 @@ class BKITParser ( Parser ):
 
         def getRuleIndex(self):
             return BKITParser.RULE_many_var
+
+        def accept(self, visitor:ParseTreeVisitor):
+            if hasattr( visitor, "visitMany_var" ):
+                return visitor.visitMany_var(self)
+            else:
+                return visitor.visitChildren(self)
 
 
 
@@ -762,6 +804,12 @@ class BKITParser ( Parser ):
         def getRuleIndex(self):
             return BKITParser.RULE_var
 
+        def accept(self, visitor:ParseTreeVisitor):
+            if hasattr( visitor, "visitVar" ):
+                return visitor.visitVar(self)
+            else:
+                return visitor.visitChildren(self)
+
 
 
 
@@ -811,6 +859,12 @@ class BKITParser ( Parser ):
 
         def getRuleIndex(self):
             return BKITParser.RULE_initial_value
+
+        def accept(self, visitor:ParseTreeVisitor):
+            if hasattr( visitor, "visitInitial_value" ):
+                return visitor.visitInitial_value(self)
+            else:
+                return visitor.visitChildren(self)
 
 
 
@@ -862,6 +916,12 @@ class BKITParser ( Parser ):
         def getRuleIndex(self):
             return BKITParser.RULE_composite_var
 
+        def accept(self, visitor:ParseTreeVisitor):
+            if hasattr( visitor, "visitComposite_var" ):
+                return visitor.visitComposite_var(self)
+            else:
+                return visitor.visitChildren(self)
+
 
 
 
@@ -901,6 +961,12 @@ class BKITParser ( Parser ):
         def getRuleIndex(self):
             return BKITParser.RULE_dimension_lst
 
+        def accept(self, visitor:ParseTreeVisitor):
+            if hasattr( visitor, "visitDimension_lst" ):
+                return visitor.visitDimension_lst(self)
+            else:
+                return visitor.visitChildren(self)
+
 
 
 
@@ -939,6 +1005,12 @@ class BKITParser ( Parser ):
 
         def getRuleIndex(self):
             return BKITParser.RULE_many_dimension
+
+        def accept(self, visitor:ParseTreeVisitor):
+            if hasattr( visitor, "visitMany_dimension" ):
+                return visitor.visitMany_dimension(self)
+            else:
+                return visitor.visitChildren(self)
 
 
 
@@ -992,6 +1064,12 @@ class BKITParser ( Parser ):
         def getRuleIndex(self):
             return BKITParser.RULE_dimension
 
+        def accept(self, visitor:ParseTreeVisitor):
+            if hasattr( visitor, "visitDimension" ):
+                return visitor.visitDimension(self)
+            else:
+                return visitor.visitChildren(self)
+
 
 
 
@@ -1032,6 +1110,12 @@ class BKITParser ( Parser ):
 
         def getRuleIndex(self):
             return BKITParser.RULE_func_declar_lst
+
+        def accept(self, visitor:ParseTreeVisitor):
+            if hasattr( visitor, "visitFunc_declar_lst" ):
+                return visitor.visitFunc_declar_lst(self)
+            else:
+                return visitor.visitChildren(self)
 
 
 
@@ -1083,6 +1167,12 @@ class BKITParser ( Parser ):
 
         def getRuleIndex(self):
             return BKITParser.RULE_many_func_decl
+
+        def accept(self, visitor:ParseTreeVisitor):
+            if hasattr( visitor, "visitMany_func_decl" ):
+                return visitor.visitMany_func_decl(self)
+            else:
+                return visitor.visitChildren(self)
 
 
 
@@ -1145,6 +1235,12 @@ class BKITParser ( Parser ):
         def getRuleIndex(self):
             return BKITParser.RULE_func_decl
 
+        def accept(self, visitor:ParseTreeVisitor):
+            if hasattr( visitor, "visitFunc_decl" ):
+                return visitor.visitFunc_decl(self)
+            else:
+                return visitor.visitChildren(self)
+
 
 
 
@@ -1192,6 +1288,12 @@ class BKITParser ( Parser ):
         def getRuleIndex(self):
             return BKITParser.RULE_func_name
 
+        def accept(self, visitor:ParseTreeVisitor):
+            if hasattr( visitor, "visitFunc_name" ):
+                return visitor.visitFunc_name(self)
+            else:
+                return visitor.visitChildren(self)
+
 
 
 
@@ -1230,6 +1332,12 @@ class BKITParser ( Parser ):
 
         def getRuleIndex(self):
             return BKITParser.RULE_func_param
+
+        def accept(self, visitor:ParseTreeVisitor):
+            if hasattr( visitor, "visitFunc_param" ):
+                return visitor.visitFunc_param(self)
+            else:
+                return visitor.visitChildren(self)
 
 
 
@@ -1272,6 +1380,12 @@ class BKITParser ( Parser ):
         def getRuleIndex(self):
             return BKITParser.RULE_param_lst
 
+        def accept(self, visitor:ParseTreeVisitor):
+            if hasattr( visitor, "visitParam_lst" ):
+                return visitor.visitParam_lst(self)
+            else:
+                return visitor.visitChildren(self)
+
 
 
 
@@ -1313,6 +1427,12 @@ class BKITParser ( Parser ):
 
         def getRuleIndex(self):
             return BKITParser.RULE_many_params
+
+        def accept(self, visitor:ParseTreeVisitor):
+            if hasattr( visitor, "visitMany_params" ):
+                return visitor.visitMany_params(self)
+            else:
+                return visitor.visitChildren(self)
 
 
 
@@ -1365,6 +1485,12 @@ class BKITParser ( Parser ):
 
         def getRuleIndex(self):
             return BKITParser.RULE_param
+
+        def accept(self, visitor:ParseTreeVisitor):
+            if hasattr( visitor, "visitParam" ):
+                return visitor.visitParam(self)
+            else:
+                return visitor.visitChildren(self)
 
 
 
@@ -1424,6 +1550,12 @@ class BKITParser ( Parser ):
         def getRuleIndex(self):
             return BKITParser.RULE_body
 
+        def accept(self, visitor:ParseTreeVisitor):
+            if hasattr( visitor, "visitBody" ):
+                return visitor.visitBody(self)
+            else:
+                return visitor.visitChildren(self)
+
 
 
 
@@ -1469,6 +1601,12 @@ class BKITParser ( Parser ):
         def getRuleIndex(self):
             return BKITParser.RULE_stmt_lst
 
+        def accept(self, visitor:ParseTreeVisitor):
+            if hasattr( visitor, "visitStmt_lst" ):
+                return visitor.visitStmt_lst(self)
+            else:
+                return visitor.visitChildren(self)
+
 
 
 
@@ -1507,6 +1645,12 @@ class BKITParser ( Parser ):
 
         def getRuleIndex(self):
             return BKITParser.RULE_other_stmt_lst
+
+        def accept(self, visitor:ParseTreeVisitor):
+            if hasattr( visitor, "visitOther_stmt_lst" ):
+                return visitor.visitOther_stmt_lst(self)
+            else:
+                return visitor.visitChildren(self)
 
 
 
@@ -1558,6 +1702,12 @@ class BKITParser ( Parser ):
 
         def getRuleIndex(self):
             return BKITParser.RULE_many_stmts
+
+        def accept(self, visitor:ParseTreeVisitor):
+            if hasattr( visitor, "visitMany_stmts" ):
+                return visitor.visitMany_stmts(self)
+            else:
+                return visitor.visitChildren(self)
 
 
 
@@ -1641,6 +1791,12 @@ class BKITParser ( Parser ):
 
         def getRuleIndex(self):
             return BKITParser.RULE_expr
+
+        def accept(self, visitor:ParseTreeVisitor):
+            if hasattr( visitor, "visitExpr" ):
+                return visitor.visitExpr(self)
+            else:
+                return visitor.visitChildren(self)
 
 
 
@@ -1778,6 +1934,12 @@ class BKITParser ( Parser ):
         def getRuleIndex(self):
             return BKITParser.RULE_operand_1
 
+        def accept(self, visitor:ParseTreeVisitor):
+            if hasattr( visitor, "visitOperand_1" ):
+                return visitor.visitOperand_1(self)
+            else:
+                return visitor.visitChildren(self)
+
 
 
     def operand_1(self, _p:int=0):
@@ -1857,6 +2019,12 @@ class BKITParser ( Parser ):
 
         def getRuleIndex(self):
             return BKITParser.RULE_operand_2
+
+        def accept(self, visitor:ParseTreeVisitor):
+            if hasattr( visitor, "visitOperand_2" ):
+                return visitor.visitOperand_2(self)
+            else:
+                return visitor.visitChildren(self)
 
 
 
@@ -1941,6 +2109,12 @@ class BKITParser ( Parser ):
         def getRuleIndex(self):
             return BKITParser.RULE_operand_3
 
+        def accept(self, visitor:ParseTreeVisitor):
+            if hasattr( visitor, "visitOperand_3" ):
+                return visitor.visitOperand_3(self)
+            else:
+                return visitor.visitChildren(self)
+
 
 
     def operand_3(self, _p:int=0):
@@ -2012,6 +2186,12 @@ class BKITParser ( Parser ):
         def getRuleIndex(self):
             return BKITParser.RULE_operand_4
 
+        def accept(self, visitor:ParseTreeVisitor):
+            if hasattr( visitor, "visitOperand_4" ):
+                return visitor.visitOperand_4(self)
+            else:
+                return visitor.visitChildren(self)
+
 
 
 
@@ -2069,6 +2249,12 @@ class BKITParser ( Parser ):
 
         def getRuleIndex(self):
             return BKITParser.RULE_operand_5
+
+        def accept(self, visitor:ParseTreeVisitor):
+            if hasattr( visitor, "visitOperand_5" ):
+                return visitor.visitOperand_5(self)
+            else:
+                return visitor.visitChildren(self)
 
 
 
@@ -2131,6 +2317,12 @@ class BKITParser ( Parser ):
 
         def getRuleIndex(self):
             return BKITParser.RULE_index_expr
+
+        def accept(self, visitor:ParseTreeVisitor):
+            if hasattr( visitor, "visitIndex_expr" ):
+                return visitor.visitIndex_expr(self)
+            else:
+                return visitor.visitChildren(self)
 
 
 
@@ -2197,6 +2389,12 @@ class BKITParser ( Parser ):
 
         def getRuleIndex(self):
             return BKITParser.RULE_index_ops
+
+        def accept(self, visitor:ParseTreeVisitor):
+            if hasattr( visitor, "visitIndex_ops" ):
+                return visitor.visitIndex_ops(self)
+            else:
+                return visitor.visitChildren(self)
 
 
 
@@ -2267,6 +2465,12 @@ class BKITParser ( Parser ):
         def getRuleIndex(self):
             return BKITParser.RULE_func_call
 
+        def accept(self, visitor:ParseTreeVisitor):
+            if hasattr( visitor, "visitFunc_call" ):
+                return visitor.visitFunc_call(self)
+            else:
+                return visitor.visitChildren(self)
+
 
 
 
@@ -2332,6 +2536,12 @@ class BKITParser ( Parser ):
         def getRuleIndex(self):
             return BKITParser.RULE_operand
 
+        def accept(self, visitor:ParseTreeVisitor):
+            if hasattr( visitor, "visitOperand" ):
+                return visitor.visitOperand(self)
+            else:
+                return visitor.visitChildren(self)
+
 
 
 
@@ -2391,6 +2601,12 @@ class BKITParser ( Parser ):
         def getRuleIndex(self):
             return BKITParser.RULE_argument_lst
 
+        def accept(self, visitor:ParseTreeVisitor):
+            if hasattr( visitor, "visitArgument_lst" ):
+                return visitor.visitArgument_lst(self)
+            else:
+                return visitor.visitChildren(self)
+
 
 
 
@@ -2445,6 +2661,12 @@ class BKITParser ( Parser ):
         def getRuleIndex(self):
             return BKITParser.RULE_many_arguments
 
+        def accept(self, visitor:ParseTreeVisitor):
+            if hasattr( visitor, "visitMany_arguments" ):
+                return visitor.visitMany_arguments(self)
+            else:
+                return visitor.visitChildren(self)
+
 
 
 
@@ -2493,6 +2715,12 @@ class BKITParser ( Parser ):
 
         def getRuleIndex(self):
             return BKITParser.RULE_argument
+
+        def accept(self, visitor:ParseTreeVisitor):
+            if hasattr( visitor, "visitArgument" ):
+                return visitor.visitArgument(self)
+            else:
+                return visitor.visitChildren(self)
 
 
 
@@ -2558,6 +2786,12 @@ class BKITParser ( Parser ):
 
         def getRuleIndex(self):
             return BKITParser.RULE_stmt
+
+        def accept(self, visitor:ParseTreeVisitor):
+            if hasattr( visitor, "visitStmt" ):
+                return visitor.visitStmt(self)
+            else:
+                return visitor.visitChildren(self)
 
 
 
@@ -2660,6 +2894,12 @@ class BKITParser ( Parser ):
         def getRuleIndex(self):
             return BKITParser.RULE_assign_stmt
 
+        def accept(self, visitor:ParseTreeVisitor):
+            if hasattr( visitor, "visitAssign_stmt" ):
+                return visitor.visitAssign_stmt(self)
+            else:
+                return visitor.visitChildren(self)
+
 
 
 
@@ -2735,6 +2975,12 @@ class BKITParser ( Parser ):
         def getRuleIndex(self):
             return BKITParser.RULE_if_stmt
 
+        def accept(self, visitor:ParseTreeVisitor):
+            if hasattr( visitor, "visitIf_stmt" ):
+                return visitor.visitIf_stmt(self)
+            else:
+                return visitor.visitChildren(self)
+
 
 
 
@@ -2786,6 +3032,12 @@ class BKITParser ( Parser ):
         def getRuleIndex(self):
             return BKITParser.RULE_elseif_stmt_lst
 
+        def accept(self, visitor:ParseTreeVisitor):
+            if hasattr( visitor, "visitElseif_stmt_lst" ):
+                return visitor.visitElseif_stmt_lst(self)
+            else:
+                return visitor.visitChildren(self)
+
 
 
 
@@ -2836,6 +3088,12 @@ class BKITParser ( Parser ):
 
         def getRuleIndex(self):
             return BKITParser.RULE_many_elseif_stmts
+
+        def accept(self, visitor:ParseTreeVisitor):
+            if hasattr( visitor, "visitMany_elseif_stmts" ):
+                return visitor.visitMany_elseif_stmts(self)
+            else:
+                return visitor.visitChildren(self)
 
 
 
@@ -2894,6 +3152,12 @@ class BKITParser ( Parser ):
         def getRuleIndex(self):
             return BKITParser.RULE_elseif_stmt
 
+        def accept(self, visitor:ParseTreeVisitor):
+            if hasattr( visitor, "visitElseif_stmt" ):
+                return visitor.visitElseif_stmt(self)
+            else:
+                return visitor.visitChildren(self)
+
 
 
 
@@ -2935,6 +3199,12 @@ class BKITParser ( Parser ):
 
         def getRuleIndex(self):
             return BKITParser.RULE_else_stmt
+
+        def accept(self, visitor:ParseTreeVisitor):
+            if hasattr( visitor, "visitElse_stmt" ):
+                return visitor.visitElse_stmt(self)
+            else:
+                return visitor.visitChildren(self)
 
 
 
@@ -3020,6 +3290,12 @@ class BKITParser ( Parser ):
         def getRuleIndex(self):
             return BKITParser.RULE_for_stmt
 
+        def accept(self, visitor:ParseTreeVisitor):
+            if hasattr( visitor, "visitFor_stmt" ):
+                return visitor.visitFor_stmt(self)
+            else:
+                return visitor.visitChildren(self)
+
 
 
 
@@ -3095,6 +3371,12 @@ class BKITParser ( Parser ):
         def getRuleIndex(self):
             return BKITParser.RULE_while_stmt
 
+        def accept(self, visitor:ParseTreeVisitor):
+            if hasattr( visitor, "visitWhile_stmt" ):
+                return visitor.visitWhile_stmt(self)
+            else:
+                return visitor.visitChildren(self)
+
 
 
 
@@ -3154,6 +3436,12 @@ class BKITParser ( Parser ):
         def getRuleIndex(self):
             return BKITParser.RULE_do_while_stmt
 
+        def accept(self, visitor:ParseTreeVisitor):
+            if hasattr( visitor, "visitDo_while_stmt" ):
+                return visitor.visitDo_while_stmt(self)
+            else:
+                return visitor.visitChildren(self)
+
 
 
 
@@ -3199,6 +3487,12 @@ class BKITParser ( Parser ):
         def getRuleIndex(self):
             return BKITParser.RULE_break_stmt
 
+        def accept(self, visitor:ParseTreeVisitor):
+            if hasattr( visitor, "visitBreak_stmt" ):
+                return visitor.visitBreak_stmt(self)
+            else:
+                return visitor.visitChildren(self)
+
 
 
 
@@ -3235,6 +3529,12 @@ class BKITParser ( Parser ):
 
         def getRuleIndex(self):
             return BKITParser.RULE_continue_stmt
+
+        def accept(self, visitor:ParseTreeVisitor):
+            if hasattr( visitor, "visitContinue_stmt" ):
+                return visitor.visitContinue_stmt(self)
+            else:
+                return visitor.visitChildren(self)
 
 
 
@@ -3283,6 +3583,12 @@ class BKITParser ( Parser ):
         def getRuleIndex(self):
             return BKITParser.RULE_call_stmt
 
+        def accept(self, visitor:ParseTreeVisitor):
+            if hasattr( visitor, "visitCall_stmt" ):
+                return visitor.visitCall_stmt(self)
+            else:
+                return visitor.visitChildren(self)
+
 
 
 
@@ -3327,6 +3633,12 @@ class BKITParser ( Parser ):
 
         def getRuleIndex(self):
             return BKITParser.RULE_expr_lst
+
+        def accept(self, visitor:ParseTreeVisitor):
+            if hasattr( visitor, "visitExpr_lst" ):
+                return visitor.visitExpr_lst(self)
+            else:
+                return visitor.visitChildren(self)
 
 
 
@@ -3381,6 +3693,12 @@ class BKITParser ( Parser ):
 
         def getRuleIndex(self):
             return BKITParser.RULE_many_exprs
+
+        def accept(self, visitor:ParseTreeVisitor):
+            if hasattr( visitor, "visitMany_exprs" ):
+                return visitor.visitMany_exprs(self)
+            else:
+                return visitor.visitChildren(self)
 
 
 
@@ -3437,6 +3755,12 @@ class BKITParser ( Parser ):
         def getRuleIndex(self):
             return BKITParser.RULE_return_stmt
 
+        def accept(self, visitor:ParseTreeVisitor):
+            if hasattr( visitor, "visitReturn_stmt" ):
+                return visitor.visitReturn_stmt(self)
+            else:
+                return visitor.visitChildren(self)
+
 
 
 
@@ -3491,6 +3815,12 @@ class BKITParser ( Parser ):
         def getRuleIndex(self):
             return BKITParser.RULE_bool_lit
 
+        def accept(self, visitor:ParseTreeVisitor):
+            if hasattr( visitor, "visitBool_lit" ):
+                return visitor.visitBool_lit(self)
+            else:
+                return visitor.visitChildren(self)
+
 
 
 
@@ -3542,6 +3872,12 @@ class BKITParser ( Parser ):
 
         def getRuleIndex(self):
             return BKITParser.RULE_lit
+
+        def accept(self, visitor:ParseTreeVisitor):
+            if hasattr( visitor, "visitLit" ):
+                return visitor.visitLit(self)
+            else:
+                return visitor.visitChildren(self)
 
 
 
@@ -3610,6 +3946,12 @@ class BKITParser ( Parser ):
         def getRuleIndex(self):
             return BKITParser.RULE_array_lit
 
+        def accept(self, visitor:ParseTreeVisitor):
+            if hasattr( visitor, "visitArray_lit" ):
+                return visitor.visitArray_lit(self)
+            else:
+                return visitor.visitChildren(self)
+
 
 
 
@@ -3650,6 +3992,12 @@ class BKITParser ( Parser ):
 
         def getRuleIndex(self):
             return BKITParser.RULE_lit_list
+
+        def accept(self, visitor:ParseTreeVisitor):
+            if hasattr( visitor, "visitLit_list" ):
+                return visitor.visitLit_list(self)
+            else:
+                return visitor.visitChildren(self)
 
 
 
@@ -3692,6 +4040,12 @@ class BKITParser ( Parser ):
 
         def getRuleIndex(self):
             return BKITParser.RULE_many_lits
+
+        def accept(self, visitor:ParseTreeVisitor):
+            if hasattr( visitor, "visitMany_lits" ):
+                return visitor.visitMany_lits(self)
+            else:
+                return visitor.visitChildren(self)
 
 
 
