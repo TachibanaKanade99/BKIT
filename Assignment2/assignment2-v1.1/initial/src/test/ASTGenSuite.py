@@ -192,7 +192,7 @@ class ASTGenSuite(unittest.TestCase):
             [
                 FuncDecl(
                     Id("foo"), 
-                    [Id("n")], 
+                    [VarDecl(Id("n"), [], None)], 
                     (
                         [], 
                         [Assign(Id("n"), IntLiteral(10))]
@@ -257,6 +257,106 @@ class ASTGenSuite(unittest.TestCase):
             )
         ])
         self.assertTrue(TestAST.checkASTGen(input, expect, 315))
+
+    def test_two_func_decl(self):
+        input = """
+            Function: foo
+                Body:
+                EndBody.
+            Function: main
+                Body:
+                    Var: a;
+                    Var: b = 10;
+                EndBody.
+        """
+        expect = Program(
+            [
+                FuncDecl(
+                    Id("foo"), 
+                    [], 
+                    ([], [])
+                ), 
+                FuncDecl(
+                    Id("main"), 
+                    [], 
+                    (
+                        [
+                            VarDecl(Id("a"), [], None), 
+                            VarDecl(Id("b"), [], IntLiteral(10))
+                        ], 
+                        []
+                    )
+                )
+            ]
+        )
+        self.assertTrue(TestAST.checkASTGen(input, expect, 316))
+
+    def test_global_var_decl_and_two_func_decls(self):
+        input = """
+        Var: a;
+        Function: foo
+            Body:
+            EndBody.
+        Function: main
+            Body:
+            EndBody.
+        """
+        expect = Program([
+            VarDecl(Id("a"), [], None), 
+            FuncDecl(Id("foo"), [], ([], [])), 
+            FuncDecl(Id("main"), [],([], []))
+        ])
+        self.assertTrue(TestAST.checkASTGen(input, expect, 317))
+
+    def test_array_global_var_decl(self):
+        input = """Var: a[5] = {1,4,3,2,0};"""
+        expect = Program([
+            VarDecl(
+                Id("a"), 
+                [IntLiteral(5)], 
+                ArrayLiteral([
+                    IntLiteral(1), 
+                    IntLiteral(4), 
+                    IntLiteral(3), 
+                    IntLiteral(2), 
+                    IntLiteral(0)
+                ])
+            )
+        ])
+        self.assertTrue(TestAST.checkASTGen(input, expect, 318))
+
+    def test_multi_dimension_array(self):
+        input = """Var: b[2][3]={{1,2,3},{4,5,6}};"""
+        expect = Program([
+            VarDecl(
+                Id("b"), 
+                [IntLiteral(2), IntLiteral(3)], 
+                ArrayLiteral([
+                    ArrayLiteral([
+                        IntLiteral(1), 
+                        IntLiteral(2), 
+                        IntLiteral(3)
+                    ]), 
+                    ArrayLiteral([
+                        IntLiteral(4), 
+                        IntLiteral(5), 
+                        IntLiteral(6)
+                    ])
+                ])
+            )
+        ])
+        self.assertTrue(TestAST.checkASTGen(input, expect, 319))
+
+    def test_array_in_param_func_decl(self):
+        input = """
+        Function: foo
+            Parameter: a[10], b
+            Body:
+            EndBody.
+        """
+        expect = ""
+        self.assertTrue(TestAST.checkASTGen(input, expect, 320))
+
 
     
     

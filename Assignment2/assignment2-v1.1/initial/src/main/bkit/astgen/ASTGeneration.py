@@ -148,7 +148,15 @@ class ASTGeneration(BKITVisitor):
 
     # func_param: PARAMETER COLON param_lst;
     def visitFunc_param(self, ctx):
-        return ctx.param_lst().accept(self)
+        decl_lst = []
+        param_lst = ctx.param_lst().accept(self)
+
+        for param in param_lst:
+            # param[0]: ID
+            # param[1]: dimension
+            decl_lst.append(VarDecl(param[0], param[1], None))
+        
+        return decl_lst
 
     # param_lst: param many_params;
     def visitParam_lst(self, ctx):
@@ -164,7 +172,7 @@ class ASTGeneration(BKITVisitor):
     # param: ID | composite_var;
     def visitParam(self, ctx):
         if ctx.ID():
-            return Id(ctx.ID().getText())
+            return [Id(ctx.ID().getText())] + [[]]
         else:
             return ctx.composite_var().accept(self)
 
