@@ -396,7 +396,7 @@ class ASTGeneration(BKITVisitor):
 
             return (vardecl_lst, stmt_lst)
         else:
-            return []
+            return ([], [])
 
     # for_stmt: FOR LP ID ASSIGN expr COMMA expr COMMA expr RP DO stmt_lst ENDFOR DOT;
     def visitFor_stmt(self, ctx):

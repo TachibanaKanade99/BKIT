@@ -50,7 +50,7 @@ class ASTGenSuite(unittest.TestCase):
                                         ]
                                     )
                                 ],
-                                []    
+                                ([], [])    
                             )
                         ]
                     )
@@ -214,8 +214,49 @@ class ASTGenSuite(unittest.TestCase):
                 FuncDecl(
                     Id("foo"), 
                     [Id("n"), Id("a"), Id("b")], 
-                    ([], []))])
+                    ([], [])
+                )
+            ]
+        )
         self.assertTrue(TestAST.checkASTGen(input, expect, 314))
+
+    def test_func_decl_with_many_stmts(self):
+        input = """
+        Function: foo
+            Parameter: a
+            Body:
+                a = a +. 10.0;
+                b = a;
+                If (c < a) Then c = a;
+                EndIf. 
+            EndBody.
+        """
+        expect = Program([
+            FuncDecl(
+                Id("foo"), 
+                [Id("a")], 
+                (
+                    [], 
+                    [
+                        Assign(
+                            Id("a"), 
+                            BinaryOp("+.", Id("a"), FloatLiteral(10.0))), 
+                            Assign(Id("b"),Id("a")), 
+                            If(
+                                [
+                                    (
+                                        BinaryOp("<",Id("c"),Id("a")), 
+                                        [], 
+                                        [Assign(Id("c"),Id("a"))]
+                                    )
+                                ], 
+                                ([], [])
+                            )
+                    ]
+                )
+            )
+        ])
+        self.assertTrue(TestAST.checkASTGen(input, expect, 315))
 
     
     
