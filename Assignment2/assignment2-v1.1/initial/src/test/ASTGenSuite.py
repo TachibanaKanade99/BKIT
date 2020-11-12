@@ -213,7 +213,11 @@ class ASTGenSuite(unittest.TestCase):
             [
                 FuncDecl(
                     Id("foo"), 
-                    [Id("n"), Id("a"), Id("b")], 
+                    [
+                        VarDecl(Id("n"), [], None), 
+                        VarDecl(Id("a"), [], None), 
+                        VarDecl(Id("b"), [], None), 
+                    ], 
                     ([], [])
                 )
             ]
@@ -234,7 +238,7 @@ class ASTGenSuite(unittest.TestCase):
         expect = Program([
             FuncDecl(
                 Id("foo"), 
-                [Id("a")], 
+                [VarDecl(Id("a"), [], None)], 
                 (
                     [], 
                     [
@@ -354,7 +358,15 @@ class ASTGenSuite(unittest.TestCase):
             Body:
             EndBody.
         """
-        expect = ""
+        expect = Program([
+            FuncDecl(
+                Id("foo"), 
+                [
+                    VarDecl(Id("a"),[IntLiteral(10)], None), VarDecl(Id("b"), [], None)
+                ], 
+                ([], [])
+            )
+        ])
         self.assertTrue(TestAST.checkASTGen(input, expect, 320))
 
 
