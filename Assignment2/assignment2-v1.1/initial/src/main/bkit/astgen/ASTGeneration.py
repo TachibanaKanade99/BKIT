@@ -293,12 +293,12 @@ class ASTGeneration(BKITVisitor):
         else:
             return ctx.func_call().accept(self)
 
-    # index_ops: LSB expr RSB | LSB expr RSB index_ops;
+    # index_ops: LSB expr RSB index_ops | LSB expr RSB;
     def visitIndex_ops(self, ctx):
-        if ctx.getChildCount() == 3:
-            return [ctx.expr().accept(self)]
-        else:
+        if ctx.getChildCount() == 4:
             return [ctx.expr().accept(self)] + ctx.index_ops().accept(self)
+        else:
+            return [ctx.expr().accept(self)]
 
     # func_call: ID LP argument_lst RP | operand;
     def visitFunc_call(self, ctx):
@@ -317,7 +317,7 @@ class ASTGeneration(BKITVisitor):
             return ctx.expr().accept(self)
 
     # argument_lst: argument many_arguments | ;
-    def argument_lst(self, ctx):
+    def visitArgument_lst(self, ctx):
         if ctx.getChildCount() == 2:
             return [ctx.argument().accept(self)] + ctx.many_arguments().accept(self)
         else:

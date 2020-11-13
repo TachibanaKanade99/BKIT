@@ -1,4 +1,4 @@
-# Generated from /media/tuanminh/DATA/Tuan_Minh/HK201/PPL/BKIT/Assignment2/assignment2-v1.1/initial/src/main/bkit/parser/BKIT.g4 by ANTLR 4.8
+# Generated from d:\Tuan_Minh\HK201\PPL\BKIT\Assignment2\assignment2-v1.1\initial\src\main\bkit\parser\BKIT.g4 by ANTLR 4.8
 # encoding: utf-8
 from antlr4 import *
 from io import StringIO
@@ -156,9 +156,9 @@ def serializedATN():
         buf.write("\u013a\3\2\2\2\u013d\u0140\3\2\2\2\u013e\u013c\3\2\2\2")
         buf.write("\u013e\u013f\3\2\2\2\u013fA\3\2\2\2\u0140\u013e\3\2\2")
         buf.write("\2\u0141\u0142\7\64\2\2\u0142\u0143\5\64\33\2\u0143\u0144")
-        buf.write("\7\65\2\2\u0144\u014b\3\2\2\2\u0145\u0146\7\64\2\2\u0146")
-        buf.write("\u0147\5\64\33\2\u0147\u0148\7\65\2\2\u0148\u0149\5B\"")
-        buf.write("\2\u0149\u014b\3\2\2\2\u014a\u0141\3\2\2\2\u014a\u0145")
+        buf.write("\7\65\2\2\u0144\u0145\5B\"\2\u0145\u014b\3\2\2\2\u0146")
+        buf.write("\u0147\7\64\2\2\u0147\u0148\5\64\33\2\u0148\u0149\7\65")
+        buf.write("\2\2\u0149\u014b\3\2\2\2\u014a\u0141\3\2\2\2\u014a\u0146")
         buf.write("\3\2\2\2\u014bC\3\2\2\2\u014c\u014d\7:\2\2\u014d\u014e")
         buf.write("\7\60\2\2\u014e\u014f\5H%\2\u014f\u0150\7\61\2\2\u0150")
         buf.write("\u0153\3\2\2\2\u0151\u0153\5F$\2\u0152\u014c\3\2\2\2\u0152")
@@ -2217,18 +2217,18 @@ class BKITParser ( Parser ):
                 self.expr()
                 self.state = 321
                 self.match(BKITParser.RSB)
+                self.state = 322
+                self.index_ops()
                 pass
 
             elif la_ == 2:
                 self.enterOuterAlt(localctx, 2)
-                self.state = 323
-                self.match(BKITParser.LSB)
                 self.state = 324
-                self.expr()
+                self.match(BKITParser.LSB)
                 self.state = 325
-                self.match(BKITParser.RSB)
+                self.expr()
                 self.state = 326
-                self.index_ops()
+                self.match(BKITParser.RSB)
                 pass
 
 

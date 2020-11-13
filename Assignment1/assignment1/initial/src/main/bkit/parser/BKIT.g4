@@ -86,7 +86,10 @@ operand_5: (MINUS | FLOAT_MINUS) operand_5 | index_expr;
 //Index expression:
 index_expr: index_expr index_ops | func_call;
 // Index operators:
-index_ops: LSB expr RSB | LSB expr RSB index_ops;
+index_ops: index_op many_index_ops;
+many_index_ops: index_op many_index_ops | ;
+index_op: LSB expr RSB;
+//index_ops: LSB expr RSB | LSB expr RSB index_ops;
 
 // Function call:
 func_call: ID LP argument_lst RP | operand;
