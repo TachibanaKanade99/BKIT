@@ -303,7 +303,7 @@ class ASTGeneration(BKITVisitor):
     # func_call: ID LP argument_lst RP | operand;
     def visitFunc_call(self, ctx):
         if ctx.getChildCount() == 4:
-            return CallExpr(ctx.ID().getText(), ctx.argument_lst().accept(self))
+            return CallExpr(Id(ctx.ID().getText()), ctx.argument_lst().accept(self))
         else:
             return ctx.operand().accept(self)
 
@@ -459,6 +459,6 @@ class ASTGeneration(BKITVisitor):
     # return_stmt: RETURN SEMI | RETURN expr SEMI;
     def visitReturn_stmt(self, ctx):
         if ctx.getChildCount() == 2:
-            return Return()
+            return Return(None)
         else:
             return Return(ctx.expr().accept(self))

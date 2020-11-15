@@ -488,7 +488,7 @@ class ASTGenSuite(unittest.TestCase):
                 [VarDecl(Id("a"), [], None)], 
                 (
                     [], 
-                    [Assign(Id("a"), CallExpr("foo",[IntLiteral(2)]))]
+                    [Assign(Id("a"), CallExpr(Id("foo"),[IntLiteral(2)]))]
                 )
             )
         ])
@@ -539,7 +539,7 @@ class ASTGenSuite(unittest.TestCase):
                     [Assign(
                         ArrayCell(
                             Id("a"), 
-                            [BinaryOp("+", IntLiteral(3), CallExpr("foo", [IntLiteral(2)]))]
+                            [BinaryOp("+", IntLiteral(3), CallExpr(Id("foo"), [IntLiteral(2)]))]
                         ), 
                         BinaryOp(
                             "+", 
@@ -576,7 +576,7 @@ class ASTGenSuite(unittest.TestCase):
                         ArrayCell(
                             Id("a"), 
                             [
-                                BinaryOp("+", IntLiteral(3), CallExpr("foo", [IntLiteral(2)])), 
+                                BinaryOp("+", IntLiteral(3), CallExpr(Id("foo"), [IntLiteral(2)])), 
                                 BinaryOp("+",ArrayCell(Id("i"), [IntLiteral(1), BinaryOp("+", IntLiteral(23), Id("i"))]), IntLiteral(10))
                             ]
                         ), 
@@ -601,7 +601,7 @@ class ASTGenSuite(unittest.TestCase):
                     [Assign(
                         Id("a"), 
                         CallExpr(
-                            "foo", 
+                            Id("foo"), 
                             [Id("a"), Id("b"), ArrayCell(Id("c"), [BinaryOp("*", IntLiteral(10), Id("i"))])
                             ]
                         )
@@ -1031,8 +1031,77 @@ class ASTGenSuite(unittest.TestCase):
                 Return;
             EndBody.
         """
-        expect = ""
+        expect = Program([
+            FuncDecl(
+                Id("main"), [], 
+                (
+                    [], [Return(None)]
+                )
+            )
+        ])
         self.assertTrue(TestAST.checkASTGen(input, expect, 344))
+
+    def test_return_stmt_with_expr(self):
+        input = """
+        Function: main
+            Body:
+                Return i == 1;
+            EndBody.
+        """
+        expect = Program([
+            FuncDecl(
+                Id("main"), [], 
+                ([], [Return(BinaryOp("==", Id("i"), IntLiteral(1)))])
+            )
+        ])
+        self.assertTrue(TestAST.checkASTGen(input, expect, 345))
+
+    def test_return_stmt(self):
+        input = """
+        Function: main
+            Parameter: a, b, a[10][12][13][14][15]
+            Body:
+                Var: a = {12, 14, 15};
+                m(13) = {12, {12, 14, 15}};
+                Return;
+            EndBody.
+        """
+        expect = Program([
+            FuncDecl(
+                Id("main"), 
+                [
+                    VarDecl(Id("a"), [], None), 
+                    VarDecl(Id("b"), [], None), 
+                    VarDecl(Id("a"), [IntLiteral(10), IntLiteral(12), IntLiteral(13), IntLiteral(14), IntLiteral(15)], None)
+                ], 
+                (
+                    [
+                        VarDecl(Id("a"), [], ArrayLiteral([IntLiteral(12), IntLiteral(14), IntLiteral(15)]))
+                    ], 
+                    [
+                        Assign(
+                            CallExpr(Id("m"),[IntLiteral(13)]), 
+                            ArrayLiteral(
+                                [
+                                    IntLiteral(12), 
+                                    ArrayLiteral(
+                                        [
+                                            IntLiteral(12), 
+                                            IntLiteral(14), 
+                                            IntLiteral(15)
+                                        ]
+                                    )
+                                ]
+                            )
+                        ), 
+                        Return(None)
+                    ]
+                )
+            )
+        ])
+        self.assertTrue(TestAST.checkASTGen(input, expect, 346))
+
+    
 
 
 
