@@ -1101,10 +1101,171 @@ class ASTGenSuite(unittest.TestCase):
         ])
         self.assertTrue(TestAST.checkASTGen(input, expect, 346))
 
+    def test_cmt_inside_array_lit(self):
+        input = """
+        Function: main
+            Body:
+                Var: a = { ** This is comment ** 1 };
+            EndBody.
+        """
+        expect = Program([
+            FuncDecl(
+                Id("main"), [], 
+                (
+                    [VarDecl(Id("a"), [], ArrayLiteral([IntLiteral(1)]))], 
+                    []
+                )
+            )
+        ])
+        self.assertTrue(TestAST.checkASTGen(input, expect, 347))
     
+    def test_empty_stmt(self):
+       input = """"""
+       expect = Program([])
+       self.assertTrue(TestAST.checkASTGen(input, expect, 348))
 
+    def test_empty_program_with_cmt(self):
+        input = """ ** This is comment** """
+        expect = Program([])
+        self.assertTrue(TestAST.checkASTGen(input, expect, 349))
 
+    def test_idx_expr_precedence(self):
+        input = """
+        Function: main
+            Body:
+                a = a[i[n + 1] - ae[10] && 100] \. 12.2; 
+            EndBody.
+        """
+        expect = Program([
+            FuncDecl(
+                Id("main"), [], 
+                (
+                    [], 
+                    [
+                        Assign(
+                            Id("a"), 
+                            BinaryOp(
+                                "\.", 
+                                ArrayCell(
+                                    Id("a"), 
+                                    [BinaryOp(
+                                        "&&", 
+                                        BinaryOp(
+                                            "-", 
+                                            ArrayCell(Id("i"), [BinaryOp("+", Id("n"), IntLiteral(1))]), 
+                                            ArrayCell(Id("ae"), [IntLiteral(10)])
+                                        ), 
+                                        IntLiteral(100)
+                                    )]
+                                ), 
+                                FloatLiteral(12.2)
+                            )
+                        )
+                    ]
+                )
+            )
+        ])
+        self.assertTrue(TestAST.checkASTGen(input, expect, 350))
 
+    def test_type_coersion_func(self):
+        input = """
+        Function: main
+            Body: 
+                If bool_of_string (" True" ) Then
+                    a = int_of_string (read ());
+                    b = float_of_int (a) +. 2.0;
+                EndIf.
+            EndBody.
+        """
+        expect = Program([
+            FuncDecl(
+                Id("main"), [], 
+                (
+                    [], 
+                    [If(
+                        [
+                            (
+                                CallExpr(
+                                    Id("bool_of_string"), 
+                                    [StringLiteral(" True")]
+                                ), 
+                                [], 
+                                [
+                                    Assign(
+                                        Id("a"), 
+                                        CallExpr(
+                                            Id("int_of_string"), 
+                                            [CallExpr(Id("read"), [])]
+                                        )
+                                    ), 
+                                    Assign(
+                                        Id("b"), 
+                                        BinaryOp(
+                                            "+.", 
+                                            CallExpr(
+                                                Id("float_of_int"), 
+                                                [Id("a")]
+                                            ), 
+                                            FloatLiteral(2.0)
+                                        )
+                                    )
+                                ]
+                            )
+                        ], 
+                        ([], [])
+                    )]
+                )
+            )
+        ])
+        self.assertTrue(TestAST.checkASTGen(input, expect, 351))
+
+    def test_many_variable_stmt(self):
+        input = """
+        Function: main
+            Body:
+                Var: a, b = 10, c[20] = {1, {2, 3, {4, 5, {6, 7}}}}, f = 23.4;
+            EndBody.
+        """
+        expect = Program([
+            FuncDecl(
+                Id("main"), [], 
+                (
+                    [
+                        VarDecl(Id("a"), [], None), 
+                        VarDecl(Id("b"), [], IntLiteral(10)), 
+                        VarDecl(
+                            Id("c"), 
+                            [IntLiteral(20)], 
+                            ArrayLiteral(
+                                [
+                                    IntLiteral(1), 
+                                    ArrayLiteral(
+                                        [
+                                            IntLiteral(2), 
+                                            IntLiteral(3), 
+                                            ArrayLiteral(
+                                                [
+                                                    IntLiteral(4), IntLiteral(5), ArrayLiteral(
+                                                        [
+                                                            IntLiteral(6), 
+                                                            IntLiteral(7)
+                                                        ]
+                                                    )
+                                                ]
+                                            )
+                                        ]
+                                    )
+                                ]
+                            )
+                        ), 
+                        VarDecl(Id("f"), [], FloatLiteral(23.4))
+                    ], 
+                    []
+                )
+            )
+        ])
+        self.assertTrue(TestAST.checkASTGen(input, expect, 352))
+     
     
 
     
