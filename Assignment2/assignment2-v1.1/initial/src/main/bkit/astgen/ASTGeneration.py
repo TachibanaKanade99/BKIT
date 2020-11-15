@@ -412,7 +412,7 @@ class ASTGeneration(BKITVisitor):
         vardecl_lst = stmts[0]
         stmt_lst = stmts[1]
 
-        return For(Id(ctx.ID().getText(), ctx.expr(0).accept(self), ctx.expr(1).accept(self), ctx.expr(2).accept(self), (vardecl_lst, stmt_lst)))
+        return For(Id(ctx.ID().getText()), ctx.expr(0).accept(self), ctx.expr(1).accept(self), ctx.expr(2).accept(self), (vardecl_lst, stmt_lst))
 
     # while_stmt: WHILE expr DO stmt_lst ENDWHILE DOT;
     def visitWhile_stmt(self, ctx):

@@ -1053,14 +1053,23 @@ class ParserSuite(unittest.TestCase):
         self.assertTrue(TestParser.checkParser(input, expect, 298))
 
     def test_for_if_stmt_in_func_decl(self):
-        input = """ 
-        Function: fact
-            Parameter: x, a[2]
+        # input = """ 
+        # Function: fact
+        #     Parameter: x, a[2]
+        #     Body:
+        #         For (i = 0, i < 10, 2) Do
+        #             If x Then Break; EndIf.
+        #         EndFor.
+        #         If x Then Break; EndIf.
+        #     EndBody.
+        # """
+        input = """
+        Function: main
             Body:
-                For (i = 0, i < 10, 2) Do
-                    If x Then Break; EndIf.
-                EndFor.
-                If x Then Break; EndIf.
+                If i Then Var: j;
+                ElseIf j Then
+                    If i == 1 Then Var: i; EndIf.
+                EndIf.
             EndBody.
         """
         expect = "successful"
