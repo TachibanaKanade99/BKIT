@@ -1919,8 +1919,463 @@ class ASTGenSuite(unittest.TestCase):
                 a = a + a * 12;
             EndBody.
         """
+        expect = Program([
+            FuncDecl(
+                Id("main"), [], 
+                (
+                    [], 
+                    [
+                        Assign(
+                            Id("a"), 
+                            BinaryOp(
+                                "+", 
+                                Id("a"), 
+                                BinaryOp("*", Id("a"), IntLiteral(12))
+                            )
+                        )
+                    ]
+                )
+            )
+        ])
+        self.assertTrue(TestAST.checkASTGen(input, expect, 376))
 
-    
+    def test_not_op_precedence(self):
+        input = """
+        Function: main
+            Body:
+                a = a + b \. 12.e-3 % (12 -. 2.0) && !True;
+            EndBody.
+        """
+        expect = Program([
+            FuncDecl(
+                Id("main"), [], 
+                (
+                    [], 
+                    [Assign(
+                        Id("a"), 
+                        BinaryOp(
+                            "&&",
+                            BinaryOp(
+                                "+", 
+                                Id("a"), 
+                                BinaryOp(
+                                    "%", 
+                                    BinaryOp("\.", Id("b"), FloatLiteral(0.012)), 
+                                    BinaryOp("-.", IntLiteral(12), FloatLiteral(2.0))
+                                )
+                            ), 
+                            UnaryOp("!", BooleanLiteral(True))
+                        )
+                    )]
+                )
+            )
+        ])
+        self.assertTrue(TestAST.checkASTGen(input, expect, 377))
+
+    def test_func_call_with_not_op(self):
+        input = """
+        Function: main
+            Body:
+                a = foo(!foo(12));
+            EndBody.
+        """  
+        expect = Program([
+            FuncDecl(
+                Id("main"), [], 
+                (
+                    [], 
+                    [Assign(
+                        Id("a"), 
+                        CallExpr(
+                            Id("foo"), 
+                            [UnaryOp(
+                                "!", 
+                                CallExpr(
+                                    Id("foo"), 
+                                    [IntLiteral(12)]
+                                )
+                            )]
+                        )
+                    )]
+                )
+            )
+        ])
+        self.assertTrue(TestAST.checkASTGen(input, expect, 378))
+
+    def test_parenthesis_inside_func_call(self):
+        input = """
+        Function: main
+            Body:
+                foo((foo((1))));
+            EndBody.
+        """
+        expect = Program([
+            FuncDecl(
+                Id("main"), 
+                [], 
+                (
+                    [], 
+                    [CallStmt(
+                        Id("foo"), 
+                        [CallExpr(
+                            Id("foo"), 
+                            [IntLiteral(1)]
+                        )]
+                    )]
+                )
+            )
+        ])
+        self.assertTrue(TestAST.checkASTGen(input, expect, 379))
+
+    def test_array_lit_as_operand(self):
+        input = """
+        Function: main
+            Body:
+                foo = {123, 4.2, {0o111}} != 2; 
+            EndBody.
+        """
+        expect = Program([
+            FuncDecl(
+                Id("main"), [], 
+                (
+                    [], 
+                    [Assign(
+                        Id("foo"), 
+                        BinaryOp(
+                            "!=", 
+                            ArrayLiteral([
+                                IntLiteral(123), 
+                                FloatLiteral(4.2), 
+                                ArrayLiteral([
+                                    IntLiteral(73)
+                                ])
+                            ]), 
+                            IntLiteral(2)
+                        )
+                    )]
+                )
+            )
+        ])
+        self.assertTrue(TestAST.checkASTGen(input, expect, 380))
+
+    def test_empty_stmt_lst_in_while_stmt(self):
+        input = """
+        Function: main
+            Body:
+                While i Do EndWhile.
+            EndBody.
+        """
+        expect = Program([
+            FuncDecl(
+                Id("main"), [], 
+                (
+                    [], 
+                    [While(
+                        Id("i"), 
+                        ([], []) 
+                    )]
+                )
+            )
+        ])
+        self.assertTrue(TestAST.checkASTGen(input, expect, 381))
+
+    def test_if_stmt_inside_for_stmt(self):
+        input = """
+        Function: main
+            Body:
+                For (i = a[12 * j], {1, 2, 3}, "Hi") Do
+                    If i && True Then
+                        i = False;
+                    ElseIf j || "False" Then Var: h = 10;
+                    EndIf.
+                EndFor.
+            EndBody.
+        """
+        expect = Program([
+            FuncDecl(
+                Id("main"), [], 
+                (
+                    [], 
+                    [For(
+                        Id("i"), 
+                        ArrayCell(
+                            Id("a"), 
+                            [BinaryOp("*", IntLiteral(12), Id("j"))]
+                        ), 
+                        ArrayLiteral([
+                            IntLiteral(1), 
+                            IntLiteral(2), 
+                            IntLiteral(3)
+                        ]), 
+                        StringLiteral("Hi"), 
+                        (
+                            [], 
+                            [If(
+                                [
+                                    (
+                                        BinaryOp("&&", Id("i"), BooleanLiteral(True)), 
+                                        [], 
+                                        [Assign(Id("i"), BooleanLiteral(False))]
+                                    ), 
+                                    (
+                                        BinaryOp("||", Id("j"), StringLiteral("False")), 
+                                        [VarDecl(Id("h"), [], IntLiteral(10))], 
+                                        []
+                                    )
+                                ], 
+                                ([], [])
+                            )]
+                        )
+                    )]
+                )
+            )
+        ])
+        self.assertTrue(TestAST.checkASTGen(input, expect, 382))
+
+    def test_for_with_do_while_stmt(self):
+        input = """
+        Function: main
+            Body:
+                Do
+                    For (i = i, i, i) Do EndFor.
+                While i EndDo.
+            EndBody.
+        """
+        expect = Program([
+            FuncDecl(
+                Id("main"), [], 
+                (
+                    [], 
+                    [Dowhile(
+                        (
+                            [], 
+                            [For(
+                                Id("i"), 
+                                Id("i"), 
+                                Id("i"), 
+                                Id("i"), 
+                                ([], [])
+                            )], 
+                        ), 
+                        Id("i")
+                    )]
+                )
+            )
+        ])
+        self.assertTrue(TestAST.checkASTGen(input, expect, 383))
+
+    def test_multiple_global_var_decl_func_decl(self):
+        input = """
+        Var: a[2] = {1, 2, 3};
+        Var: b = "Hiiiii";
+        Var: m;
+        Var: n = True;
+        Function: foo Body: EndBody.
+        Function: main Body: EndBody.
+        """
+        expect = Program([
+            VarDecl(
+                Id("a"), 
+                [IntLiteral(2)], 
+                ArrayLiteral([
+                    IntLiteral(1), 
+                    IntLiteral(2), 
+                    IntLiteral(3)
+                ])
+            ), 
+            VarDecl(Id("b"), [], StringLiteral("Hiiiii")), 
+            VarDecl(Id("m"), [], None), 
+            VarDecl(Id("n"), [], BooleanLiteral(True)), 
+            FuncDecl(Id("foo"), [], ([], [])), 
+            FuncDecl(Id("main"), [], ([], []))
+        ])
+        self.assertTrue(TestAST.checkASTGen(input, expect, 384))
+
+    def test_bool_lit_inside_func_call(self):
+        input = """
+        Function: main
+            Body:
+                foo(0x123, "He\\rllo\\b", True) = foo(True);
+            EndBody.
+        """
+        expect = Program([
+            FuncDecl(
+                Id("main"), [], 
+                (
+                    [], 
+                    [Assign(
+                        CallExpr(
+                            Id("foo"), 
+                            [
+                                IntLiteral(291), 
+                                StringLiteral("He\\rllo\\b"), 
+                                BooleanLiteral(True)
+                            ]
+                        ), 
+                        CallExpr(Id("foo"), [BooleanLiteral(True)])
+                    )]
+                )
+            )
+        ])
+        self.assertTrue(TestAST.checkASTGen(input, expect, 385))
+
+    def test_empty_stmt_in_if_stmt(self):
+        input = """
+        Function: main
+            Body:
+                If i Then EndIf.
+            EndBody.
+        """
+        expect = Program([
+            FuncDecl(
+                Id("main"), [], 
+                (
+                    [], 
+                    [If(
+                        [
+                            (Id("i"), [], [])
+                        ], 
+                        ([],[])
+                    )]
+                )
+            )
+        ])
+        self.assertTrue(TestAST.checkASTGen(input, expect, 386))
+
+    def test_empty_stmt_in_elseif_stmt(self):
+        input = """
+        Function: main
+            Body:
+                If i Then Var: j = {1, 2, 3};
+                ElseIf j Then
+                EndIf.
+            EndBody.
+        """
+        expect = Program([
+            FuncDecl(
+                Id("main"), [], 
+                (
+                    [], 
+                    [If(
+                        [
+                            (
+                                Id("i"), 
+                                [VarDecl(
+                                    Id("j"), [], 
+                                    ArrayLiteral([
+                                        IntLiteral(1), 
+                                        IntLiteral(2), 
+                                        IntLiteral(3)
+                                    ])
+                                )], 
+                                []
+                            ), 
+                            (Id("j"), [], [])
+                        ], 
+                        ([], [])
+                    )]
+                )
+            )
+        ])
+        self.assertTrue(TestAST.checkASTGen(input, expect, 387))
+
+    def test_empty_stmt_multiple_elseif_stmt(self):
+        input = """
+        Function: main
+            Body:
+                If i Then
+                ElseIf j Then
+                ElseIf {1, 2} Then
+                ElseIf True Then
+                ElseIf "Hmmm" Then
+                Else
+                EndIf.
+            EndBody.
+        """
+        expect = Program([
+            FuncDecl(
+                Id("main"), [], 
+                (
+                    [], 
+                    [If(
+                        [
+                            (Id("i"), [], []), 
+                            (Id("j"), [], []), 
+                            (
+                                ArrayLiteral([
+                                IntLiteral(1), 
+                                IntLiteral(2)
+                                ]), 
+                                [], 
+                                []
+                            ), 
+                            (BooleanLiteral(True), [], []), 
+                            (StringLiteral("Hmmm"), [], [])
+                        ], 
+                        ([], [])
+                    )]
+                )
+            )
+        ])
+        self.assertTrue(TestAST.checkASTGen(input, expect, 388))
+
+    def test_return_stmt_in_do_stmt(self):
+        input = """
+        Function: main
+            Body:
+                Do Return; While False EndDo.
+            EndBody.
+        """
+        expect = Program([
+            FuncDecl(
+                Id("main"), [], 
+                (
+                    [], 
+                    [Dowhile(
+                        ([], [Return(None)]), 
+                        BooleanLiteral(False)
+                    )]
+                )
+            )
+        ])
+        self.assertTrue(TestAST.checkASTGen(input, expect, 389))
+
+    def test_return_stmt_in_while_stmt(self):
+        input = """
+        Function: main
+            Body:
+                While {1} Do Return 10 \. foo({1, 2}); EndWhile.
+            EndBody.
+        """
+        expect = Program([
+            FuncDecl(
+                Id("main"), [], 
+                (
+                    [], 
+                    [While(
+                        ArrayLiteral([IntLiteral(1)]), 
+                        (
+                            [], 
+                            [Return(
+                                BinaryOp(
+                                    "\.", 
+                                    IntLiteral(10), 
+                                    CallExpr(
+                                        Id("foo"), 
+                                        [ArrayLiteral([
+                                            IntLiteral(1), 
+                                            IntLiteral(2)
+                                        ])]
+                                    )
+                                )
+                            )]
+                        )
+                    )]
+                )
+            )
+        ])
+        self.assertTrue(TestAST.checkASTGen(input, expect, 390))
+
     
     
 
