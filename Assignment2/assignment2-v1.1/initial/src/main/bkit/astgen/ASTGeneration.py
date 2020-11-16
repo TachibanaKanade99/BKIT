@@ -127,7 +127,15 @@ class ASTGeneration(BKITVisitor):
 
     # dimension: LSB INT_LIT RSB;
     def visitDimension(self, ctx):
-        return IntLiteral(int(ctx.INT_LIT().getText()))
+        # return int(ctx.INT_LIT().getText())
+        prefix = ctx.INT_LIT().getText()[0:2]
+
+        if prefix == "0X" or prefix == "0x":
+            return int(ctx.INT_LIT().getText(), 16)
+        elif prefix == "0o" or prefix == "0O":
+            return int(ctx.INT_LIT().getText(), 8)
+        else:
+            return int(ctx.INT_LIT().getText())
 
     # func_declar_lst: func_decl many_func_decl | ;
     def visitFunc_declar_lst(self, ctx):

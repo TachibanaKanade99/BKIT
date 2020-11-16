@@ -16,7 +16,7 @@ class ASTGenSuite(unittest.TestCase):
         input = """Var: a[10];"""
         expect = Program(
             [
-                VarDecl(Id("a"), [IntLiteral(10)], None)
+                VarDecl(Id("a"), [10], None)
             ]
         )
         self.assertTrue(TestAST.checkASTGen(input, expect, 302))
@@ -62,7 +62,7 @@ class ASTGenSuite(unittest.TestCase):
         input = """Var: a[10][20];"""
         expect = Program(
             [
-                VarDecl(Id("a"), [IntLiteral(10), IntLiteral(20)], None)
+                VarDecl(Id("a"), [10, 20], None)
             ]
         )
         self.assertTrue(TestAST.checkASTGen(input, expect, 304))
@@ -72,7 +72,7 @@ class ASTGenSuite(unittest.TestCase):
         expect = Program(
             [
                 VarDecl(Id("a"), [], None),
-                VarDecl(Id("b"), [IntLiteral(10)], None)
+                VarDecl(Id("b"), [10], None)
             ]
         )
         self.assertTrue(TestAST.checkASTGen(input, expect, 305))
@@ -91,7 +91,7 @@ class ASTGenSuite(unittest.TestCase):
         expect = Program(
             [
                 VarDecl(Id("a"), [], FloatLiteral(0.012)),
-                VarDecl(Id("b"), [IntLiteral(10)], None)
+                VarDecl(Id("b"), [10], None)
             ]
         )
         self.assertTrue(TestAST.checkASTGen(input, expect, 307))
@@ -101,7 +101,7 @@ class ASTGenSuite(unittest.TestCase):
         expect = Program(
             [
                 VarDecl(Id("b"), 
-                    [IntLiteral(2), IntLiteral(3)],
+                    [2, 3],
                     ArrayLiteral([
                         ArrayLiteral([IntLiteral(2), IntLiteral(3), IntLiteral(4)]),
                         ArrayLiteral([IntLiteral(4), IntLiteral(5),IntLiteral(6)])
@@ -317,7 +317,7 @@ class ASTGenSuite(unittest.TestCase):
         expect = Program([
             VarDecl(
                 Id("a"), 
-                [IntLiteral(5)], 
+                [5], 
                 ArrayLiteral([
                     IntLiteral(1), 
                     IntLiteral(4), 
@@ -334,7 +334,7 @@ class ASTGenSuite(unittest.TestCase):
         expect = Program([
             VarDecl(
                 Id("b"), 
-                [IntLiteral(2), IntLiteral(3)], 
+                [2, 3], 
                 ArrayLiteral([
                     ArrayLiteral([
                         IntLiteral(1), 
@@ -362,7 +362,7 @@ class ASTGenSuite(unittest.TestCase):
             FuncDecl(
                 Id("foo"), 
                 [
-                    VarDecl(Id("a"),[IntLiteral(10)], None), VarDecl(Id("b"), [], None)
+                    VarDecl(Id("a"),[10], None), VarDecl(Id("b"), [], None)
                 ], 
                 ([], [])
             )
@@ -402,7 +402,7 @@ class ASTGenSuite(unittest.TestCase):
                 (
                     [
                         VarDecl(Id("a"), [], IntLiteral(10)), VarDecl(Id("b"), [], None), 
-                        VarDecl(Id("c"), [IntLiteral(10)], None)
+                        VarDecl(Id("c"), [10], None)
                     ], 
                     []
                 )
@@ -918,7 +918,7 @@ class ASTGenSuite(unittest.TestCase):
                 [
                     VarDecl(Id("a"), [], None), 
                     VarDecl(Id("b"), [], None), 
-                    VarDecl(Id("a"), [IntLiteral(12)], None)
+                    VarDecl(Id("a"), [12], None)
                 ], 
                 (
                     [
@@ -986,7 +986,7 @@ class ASTGenSuite(unittest.TestCase):
                 [
                     VarDecl(Id("a"), [], None), 
                     VarDecl(Id("b"), [], None), 
-                    VarDecl(Id("a"), [IntLiteral(12)], None)
+                    VarDecl(Id("a"), [12], None)
                 ], 
                 (
                     [
@@ -1072,7 +1072,7 @@ class ASTGenSuite(unittest.TestCase):
                 [
                     VarDecl(Id("a"), [], None), 
                     VarDecl(Id("b"), [], None), 
-                    VarDecl(Id("a"), [IntLiteral(10), IntLiteral(12), IntLiteral(13), IntLiteral(14), IntLiteral(15)], None)
+                    VarDecl(Id("a"), [10, 12, 13, 14, 15], None)
                 ], 
                 (
                     [
@@ -1235,7 +1235,7 @@ class ASTGenSuite(unittest.TestCase):
                         VarDecl(Id("b"), [], IntLiteral(10)), 
                         VarDecl(
                             Id("c"), 
-                            [IntLiteral(20)], 
+                            [20], 
                             ArrayLiteral(
                                 [
                                     IntLiteral(1), 
@@ -2176,7 +2176,7 @@ class ASTGenSuite(unittest.TestCase):
         expect = Program([
             VarDecl(
                 Id("a"), 
-                [IntLiteral(2)], 
+                [2], 
                 ArrayLiteral([
                     IntLiteral(1), 
                     IntLiteral(2), 
@@ -2521,7 +2521,7 @@ class ASTGenSuite(unittest.TestCase):
                 Id("main"), 
                 [
                     VarDecl(Id("a"), [], None), 
-                    VarDecl(Id("a"), [IntLiteral(0)], None), 
+                    VarDecl(Id("a"), [0], None), 
                     VarDecl(Id("b1"), [], None), 
                     VarDecl(Id("a_9"), [], None)
                 ], 
