@@ -70,7 +70,15 @@ class ASTGeneration(BKITVisitor):
     # lit: INT_LIT | FLOAT_LIT | STRING_LIT | bool_lit | array_lit;
     def visitLit(self, ctx):
         if ctx.INT_LIT():
-            return IntLiteral(int(ctx.INT_LIT().getText()))
+            prefix = ctx.INT_LIT().getText()[0:2]
+
+            if prefix == "0X" or prefix == "0x":
+                return IntLiteral(int(ctx.INT_LIT().getText(), 16))
+            elif prefix == "0o" or prefix == "0O":
+                return IntLiteral(int(ctx.INT_LIT().getText(), 8))
+            else:
+                return IntLiteral(int(ctx.INT_LIT().getText()))
+            # return IntLiteral(int(ctx.INT_LIT().getText()))
         elif ctx.FLOAT_LIT():
             return FloatLiteral(float(ctx.FLOAT_LIT().getText()))
         elif ctx.STRING_LIT():
