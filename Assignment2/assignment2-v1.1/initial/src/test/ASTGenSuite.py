@@ -2376,10 +2376,231 @@ class ASTGenSuite(unittest.TestCase):
         ])
         self.assertTrue(TestAST.checkASTGen(input, expect, 390))
 
-    
+    def test_break_stmt_in_func_decl(self):
+        input = """
+        Function: main
+            Body:
+                Break;
+            EndBody.
+        """
+        expect = Program([
+            FuncDecl(
+                Id("main"), [], 
+                (
+                    [], [Break()]
+                )
+            )
+        ])
+        self.assertTrue(TestAST.checkASTGen(input, expect, 391))
+
+    def test_continue_stmt_in_func_decl(self):
+        input = """
+        Function: main
+            Body:
+                Continue;
+            EndBody.
+        """
+        expect = Program([
+            FuncDecl(
+                Id("main"), [], 
+                (
+                    [], [Continue()]
+                )
+            )
+        ])
+        self.assertTrue(TestAST.checkASTGen(input, expect, 392))
+
+    def test_nested_func_call(self):
+        input = """
+        Function: main
+            Body:
+                a = foo(foo(foo(foo())));
+                foo(foo(foo(foo())));
+            EndBody.
+        """
+        expect = Program([
+            FuncDecl(
+                Id("main"), [], 
+                (
+                    [], 
+                    [
+                        Assign(
+                            Id("a"), 
+                            CallExpr(
+                                Id("foo"), 
+                                [CallExpr(
+                                    Id("foo"), 
+                                    [CallExpr(
+                                        Id("foo"), 
+                                        [CallExpr(
+                                            Id("foo"), [])
+                                        ]
+                                    )]
+                                )]
+                            )
+                        ), 
+                        CallStmt(
+                            Id("foo"), 
+                            [CallExpr(
+                                Id("foo"), 
+                                [CallExpr(
+                                    Id("foo"), 
+                                    [CallExpr(
+                                        Id("foo"), []
+                                    )]
+                                )]
+                            )]
+                        )
+                    ]
+                )
+            )
+        ])
+        self.assertTrue(TestAST.checkASTGen(input, expect, 393))
+
+    def test_string_lit_inside_idx_expression(self):
+        input = """
+        Function: main
+            Body:
+                foo(a["Hi"]["Me"][True]);
+            EndBody.
+        """
+        expect = Program([
+            FuncDecl(
+                Id("main"), [], 
+                (
+                    [], 
+                    [CallStmt(
+                        Id("foo"), 
+                        [ArrayCell(
+                            Id("a"), 
+                            [
+                                StringLiteral("Hi"), 
+                                StringLiteral("Me"), 
+                                BooleanLiteral(True)
+                            ]
+                        )]
+                    )]
+                )
+            )
+        ])
+        self.assertTrue(TestAST.checkASTGen(input, expect, 394))
+
+    def test_idx_expr_with_func_call(self):
+        input = """
+        Function: main
+            Body:
+                a = foo(2)[3 + x];
+            EndBody.
+        """
+        expect = Program([
+            FuncDecl(
+                Id("main"), [], 
+                (
+                    [], 
+                    [Assign(
+                        Id("a"), 
+                        ArrayCell(
+                            CallExpr(Id("foo"), [IntLiteral(2)]), 
+                            [BinaryOp("+", IntLiteral(3), Id("x"))]
+                        )
+                    )]
+                )
+            )
+        ])
+        self.assertTrue(TestAST.checkASTGen(input, expect, 395))
+
+    def test_many_params_in_func_decl(self):
+        input = """
+        Function: main
+            Parameter: a, a[0], b1, a_9
+            Body:
+            EndBody.
+        """
+        expect = Program([
+            FuncDecl(
+                Id("main"), 
+                [
+                    VarDecl(Id("a"), [], None), 
+                    VarDecl(Id("a"), [IntLiteral(0)], None), 
+                    VarDecl(Id("b1"), [], None), 
+                    VarDecl(Id("a_9"), [], None)
+                ], 
+                ([], [])
+            )
+        ])
+        self.assertTrue(TestAST.checkASTGen(input, expect, 396))
+
+    def test_hexa_int_lit_in_call_stmt(self):
+        input = """
+        Function: main
+            Body:
+                foo(0xABF);
+            EndBody.
+        """
+        expect = Program([
+            FuncDecl(
+                Id("main"), [], 
+                (
+                    [], 
+                    [CallStmt(
+                        Id("foo"), 
+                        [IntLiteral(int("0xABF", 16))]
+                    )]
+                )
+            )
+        ])
+        self.assertTrue(TestAST.checkASTGen(input, expect, 397))
+
+    def test_octal_int_lit_in_call_stmt(self):
+        input = """
+        Function: main
+            Body:
+                foo(0o177);
+            EndBody.
+        """
+        expect = Program([
+            FuncDecl(
+                Id("main"), [], 
+                (
+                    [], 
+                    [CallStmt(
+                        Id("foo"), 
+                        [IntLiteral(int("0o177", 8))]
+                    )]
+                )
+            )
+        ])
+        self.assertTrue(TestAST.checkASTGen(input, expect, 398))
+
+    def test_global_var_decl_with_hexadecimal(self):
+        input = """
+        Var: a = 0X1A2F;
+        Function: main
+            Body:
+            EndBody.
+        """
+        expect = Program([
+            VarDecl(Id("a"), [], IntLiteral(int("0X1A2F", 16))), 
+            FuncDecl(Id("main"), [], ([], []))
+        ])
+        self.assertTrue(TestAST.checkASTGen(input, expect, 399))
+
+    def test_global_var_decl_with_octal(self):
+        input = """
+        Var: a = 0O1234567;
+        Function: main
+            Body:
+            EndBody.
+        """
+        expect = Program([
+            VarDecl(Id("a"), [], IntLiteral(int("0O1234567", 8))), 
+            FuncDecl(Id("main"), [], ([], []))
+        ])
+        self.assertTrue(TestAST.checkASTGen(input, expect, 400))
+
     
 
-
+    
     
 
 
