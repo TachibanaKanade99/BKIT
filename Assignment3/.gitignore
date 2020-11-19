@@ -5,3 +5,11 @@ assignment3.zip
 solutions/
 testcases/
 __pycache__/
+
+LexerSuite.py
+ParserSuite.py
+
+AST.py
+ASTGeneration.py
+ASTGenSuite.py
+BKIT.g4
