@@ -2592,11 +2592,60 @@ class ASTGenSuite(unittest.TestCase):
             Body:
             EndBody.
         """
+        # expect = Program([
+        #     VarDecl(Id("a"), [], IntLiteral(int("0O1234567", 8))), 
+        #     FuncDecl(Id("main"), [], ([], []))
+        # ])
         expect = Program([
-            VarDecl(Id("a"), [], IntLiteral(int("0O1234567", 8))), 
-            FuncDecl(Id("main"), [], ([], []))
-        ])
+            VarDecl("t",IntType()),
+            FuncDecl(
+                "a",
+                [
+                    VarDecl("m",FloatType()),
+                    VarDecl("b",IntType()),
+                    VarDecl("d",FloatType())
+                ],
+                (
+                    [
+                        ConstDecl("c",IntLit(3)),
+                        FuncDecl(
+                            "foo",
+                            [
+                                VarDecl("x",IntType())
+                            ],
+                            (
+                                [
+                                    VarDecl("y",IntType()),
+                                    VarDecl("z",IntType())
+                                ],
+                                [
+                                    Id("y"),
+                                    Id("x"),
+                                    Id("foo"),
+                                    Id("c"),
+                                    Id("m"),
+                                    Id("a"),
+                                    Id("t")
+                                ]
+                            )
+                        ),
+                        FuncDecl(
+                            "foo1",
+                            [],
+                            (
+                                [],
+                                [
+                                    Id("foo"),
+                                    Id("d"),
+                                    Id("x")
+                                ]
+                            )
+                        )
+                    ],
+                    [
+                        Id("foo"),Id("d"),Id("foo1")]))])
         self.assertTrue(TestAST.checkASTGen(input, expect, 400))
+
 
     
 
