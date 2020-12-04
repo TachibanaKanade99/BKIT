@@ -158,45 +158,84 @@ class StaticChecker(BaseVisitor):
             right_expr.opType = left_expr.opType
 
         if op == '+' or op == '-' or op == '*' or op == '\\' or op == '%':
+            if left_expr.opType is None and right_expr.opType is None:
+                left_expr.opType = int
+                right_expr.opType = int
             if left_expr.opType is not int or right_expr.opType is not int:
                 raise TypeMismatchInExpression(ast)
-            else:
-                return Operand(None, int, "expression", None)
+            return Operand(None, int, "expression", None)
 
         if op == '+.' or op == '-.' or op == '*.' or op == '\.':
+            if left_expr.opType is None and right_expr.opType is None:
+                left_expr.opType = float
+                right_expr.opType = float
             if left_expr.opType is not float or right_expr.opType is not float:
-                raise TypeMismatchInExpression(ast)
-            else:
-                return Operand(None, float, "expression", None)
+                raise TypeMismatchInExpression(ast)    
+            return Operand(None, float, "expression", None)
 
         if op == '!' or op == '&&' or op == '||':
+            if left_expr.opType is None and right_expr.opType is None:
+                left_expr.opType = bool
+                right_expr.opType = bool
             if left_expr.opType is not bool or right_expr.opType is not bool:
                 raise TypeMismatchInExpression(ast)
-            else:
-                return Operand(None, bool, "expression", None)
+            return Operand(None, bool, "expression", None)
 
         if op == '==' or op == '!=' or op == '>' or op == '<' or op == '>=' or op == '<=':
+            if left_expr.opType is None and right_expr.opType is None:
+                left_expr.opType = int
+                right_expr.opType = int
             if left_expr.opType is not int or right_expr.opType is not int:
                 raise TypeMismatchInExpression(ast)
-            else:
-                return Operand(None, int, "expression", None)
+            return Operand(None, int, "expression", None)
 
         if op == '=/=' or op == '<.' or op == '>.' or op == '<=.' or op == '>=.':
+            if left_expr.opType is None and right_expr.opType is None:
+                left_expr.opType = float
+                right_expr.opType = float
             if left_expr.opType is not float or right_expr.opType is not float:
                 raise TypeMismatchInExpression(ast)
-            else:
-                return Operand(None, float, "expression", None)
+            return Operand(None, float, "expression", None)
 
     def visitUnaryOp(self, ast, param):
         decl_lst = param
         op = ast.op
         expr = ast.body.accept(self, decl_lst)
 
-        
+        if op == '-':
+            if expr.opType is None:
+                expr.opType = int
+            if expr.opType is not int:
+                raise TypeMismatchInExpression(ast)
+            return Operand(None, int, "expression", None)
+
+        if op == '-.':
+            if expr.opType is None:
+                expr.opType = float
+            if expr.opType is not float:
+                raise TypeMismatchInExpression(ast)
+            return Operand(None, float, "expression", None)
+
+        if op == '!':
+            if expr.opType is None:
+                expr.opType = bool
+            if expr.opType is not bool:
+                raise TypeMismatchInExpression(ast)
+            return Operand(None, bool, "expression", None)
     
     def visitCallExpr(self, ast, param):
         decl_lst = param
-        func_name = ast.method.accept(self, decl_lst+["func_call"])
+        func = ast.method.accept(self, decl_lst+["func_call"])
+
+        # visit arguments in func_call:
+        arg_lst = []
+        for x in ast.param:
+            arg = x.accept(self, decl_lst)
+            arg_lst.append(arg)
+
+        if len(func.param_lst) != len(arg_lst):
+            raise TypeMismatchInExpression(ast)
+        
 
     def visitAssign(self, ast, param):
         decl_lst = param
