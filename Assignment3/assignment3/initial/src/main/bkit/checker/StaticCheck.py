@@ -126,9 +126,10 @@ class StaticChecker(BaseVisitor):
         new_decl_lst[0].append(Operand(func_name, func_type, "function", param_lst))
 
         # visit param:
-        for x in ast.param:
-            param_decl = x.accept(self, [param_lst, "param"])
-            param_lst.append(param_decl)
+        if len(ast.param) > 0:
+            for x in ast.param:
+                param_decl = x.accept(self, [param_lst, "param"])
+                param_lst.append(param_decl)
 
         # visit body[0]:
         # copy a new_lst
@@ -229,7 +230,7 @@ class StaticChecker(BaseVisitor):
         func.opKind = "func_call"
 
         # infer type for function:
-        if func.param_lst is not None:
+        if len(func.param_lst) > 0:
             func.opType = func.param_lst[0].opType
 
         # visit arguments in func_call:
@@ -247,7 +248,7 @@ class StaticChecker(BaseVisitor):
         func.opKind = "call_stmt"
 
         # infer type for function:
-        if func.param_lst is not None:
+        if len(func.param_lst) > 0:
             func.opType = func.param_lst[0].opType
 
         # visit arguments in call stmt:
