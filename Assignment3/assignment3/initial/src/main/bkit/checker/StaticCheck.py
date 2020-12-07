@@ -153,9 +153,9 @@ class StaticChecker(BaseVisitor):
         left_expr = ast.left.accept(self, decl_lst)
         right_expr = ast.right.accept(self, decl_lst)
 
-        if left_expr is None and right_expr is not None:
+        if left_expr.opType is None and right_expr.opType is not None:
             left_expr.opType = right_expr.opType
-        if left_expr is not None and right_expr is None:
+        if left_expr.opType is not None and right_expr.opType is None:
             right_expr.opType = left_expr.opType
 
         if op == '+' or op == '-' or op == '*' or op == '\\' or op == '%':
@@ -188,7 +188,7 @@ class StaticChecker(BaseVisitor):
                 right_expr.opType = int
             if left_expr.opType is not int or right_expr.opType is not int:
                 raise TypeMismatchInExpression(ast)
-            return Operand(None, int, "bin_op", None)
+            return Operand(None, bool, "bin_op", None)
 
         if op == '=/=' or op == '<.' or op == '>.' or op == '<=.' or op == '>=.':
             if left_expr.opType is None and right_expr.opType is None:
@@ -317,14 +317,19 @@ class StaticChecker(BaseVisitor):
         var_decl_lst = ast.loop[0]
         stmt_lst = ast.loop[1]
 
-        # check type of index:
+        # infer type for index if its type is None:
+        if index.opType is None:
+            index.opType = int
+
+        # check type of index:        
         if index.opType != int:
             raise TypeMismatchInStatement(ast)
         
         # check type of expression 1:
         if expr_1.opType != int:
             raise TypeMismatchInStatement(ast)
-
+            print("Hello World!")
+        
         # check type of expression 2:
         if expr_2.opType != bool:
             raise TypeMismatchInStatement(ast)
@@ -345,6 +350,8 @@ class StaticChecker(BaseVisitor):
         for y in stmt_lst:
             stmt = y.accept(self, new_decl_lst)
     
+    def visitDowhile(self, ast, param):
+        return None
 
     def visitId(self, ast, param):
         decl_lst = param

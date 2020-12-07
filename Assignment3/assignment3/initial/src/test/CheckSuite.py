@@ -276,7 +276,55 @@ class CheckSuite(unittest.TestCase):
         expect = str(Undeclared(Identifier(), "i"))
         self.assertTrue(TestChecker.test(input, expect, 416))
 
+    def test_simple_for_stmt(self):
+        input = """
+        Function: main
+            Body:
+                Var: i;
+                For (i = 10.1, i < 10, 2) Do
+                    read();
+                EndFor.
+            EndBody.
+        """
+        expect = str(TypeMismatchInStatement(For(Id("i"), FloatLiteral(10.1), BinaryOp("<", Id("i"), IntLiteral(10)), IntLiteral(2), ([], [CallStmt(Id("read"),[])]))))
+        self.assertTrue(TestChecker.test(input, expect, 417))
 
+    def test_simple_type_mismatch_in_for_stmt(self):
+        input = """
+        Function: main
+            Body:
+                Var: i = 10;
+                For (i = 1, 2, 2) Do EndFor.
+            EndBody.
+        """
+        expect = str(TypeMismatchInStatement(For(Id("i"), IntLiteral(1), IntLiteral(2), IntLiteral(2), ([], []))))
+        self.assertTrue(TestChecker.test(input, expect, 418))
 
+    def test_undeclared_index_in_for_stmt(self):
+        input = """
+        Function: main
+            Body:
+                For (i = 1, False, i) Do EndFor.
+            EndBody.
+        """
+        expect = str(Undeclared(Identifier(), "i"))
+        self.assertTrue(TestChecker.test(input, expect, 419))
+
+    def test_redeclared_var_decl_in_for_stmt(self):
+        input = """
+        Function: main
+            Body:
+                Var: i = 0;
+                For (i = 1, True, 2) Do
+                    Var: i = "Hello World!";
+                    Var: a = 10;
+                    Var: a;
+                EndFor.
+            EndBody.
+        """
+        expect = str(Redeclared(Variable(), "a"))
+        self.assertTrue(TestChecker.test(input, expect, 420))
+
+    
 
 
