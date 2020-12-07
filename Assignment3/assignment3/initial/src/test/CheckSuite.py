@@ -124,7 +124,7 @@ class CheckSuite(unittest.TestCase):
             EndBody.
         """
         expect = str(Redeclared(Parameter(), "b"))
-        self.assertTrue(TestChecker.test(input, expect, 404))
+        self.assertTrue(TestChecker.test(input, expect, 405))
 
     def test_redeclared_var_in_func_body(self):
         input = """
@@ -139,7 +139,7 @@ class CheckSuite(unittest.TestCase):
             EndBody.
         """
         expect = str(Redeclared(Variable(), "a"))
-        self.assertTrue(TestChecker.test(input, expect, 405))
+        self.assertTrue(TestChecker.test(input, expect, 406))
 
     def test_var_declared_in_func_body(self):
         input = """
@@ -156,7 +156,7 @@ class CheckSuite(unittest.TestCase):
             EndBody.
         """
         expect = str(Redeclared(Variable(), "b"))
-        self.assertTrue(TestChecker.test(input, expect, 406))
+        self.assertTrue(TestChecker.test(input, expect, 407))
 
     def test_undeclared_identifier(self):
         input = """
@@ -170,7 +170,7 @@ class CheckSuite(unittest.TestCase):
             EndBody.
         """
         expect = str(Undeclared(Identifier(), "a"))
-        self.assertTrue(TestChecker.test(input, expect, 407))
+        self.assertTrue(TestChecker.test(input, expect, 408))
 
     def test_undeclared_function(self):
         input = """
@@ -185,7 +185,7 @@ class CheckSuite(unittest.TestCase):
             EndBody.
         """
         expect = str(Undeclared(Function(), "foo1"))
-        self.assertTrue(TestChecker.test(input, expect, 408))
+        self.assertTrue(TestChecker.test(input, expect, 409))
 
     def test_simple_bin_op(self):
         input = """
@@ -196,7 +196,7 @@ class CheckSuite(unittest.TestCase):
             EndBody.
         """
         expect = str(TypeMismatchInExpression(BinaryOp("+", IntLiteral(1), Id("x"))))
-        self.assertTrue(TestChecker.test(input, expect, 409))
+        self.assertTrue(TestChecker.test(input, expect, 410))
     
     def test_simple_unary_op(self):
         input = """
@@ -207,7 +207,7 @@ class CheckSuite(unittest.TestCase):
             EndBody.
         """ 
         expect = str(TypeMismatchInExpression(UnaryOp("-", Id("x"))))
-        self.assertTrue(TestChecker.test(input, expect, 410))
+        self.assertTrue(TestChecker.test(input, expect, 411))
 
     def test_simple_func_call(self):
         input = """
@@ -225,7 +225,7 @@ class CheckSuite(unittest.TestCase):
             EndBody.
         """
         expect = str(TypeMismatchInExpression(CallExpr(Id("foo"), [IntLiteral(1)])))
-        self.assertTrue(TestChecker.test(input, expect, 411))
+        self.assertTrue(TestChecker.test(input, expect, 412))
 
     def test_simple_call_stmt(self):
         input = """
@@ -238,10 +238,43 @@ class CheckSuite(unittest.TestCase):
             EndBody.
         """
         expect = str(TypeMismatchInStatement(CallStmt(Id("foo"), [IntLiteral(1)])))
-        self.assertTrue(TestChecker.test(input, expect, 412))
+        self.assertTrue(TestChecker.test(input, expect, 413))
 
+    def test_simple_if(self):
+        input = """
+        Function: main
+            Body:
+                Var: i = 1;
+                If i Then i = False; EndIf.
+            EndBody.
+        """
+        expect = str(TypeMismatchInStatement(If([(Id("i"), [], [Assign(Id("i"), BooleanLiteral(False))])], ([], []))))
+        self.assertTrue(TestChecker.test(input, expect, 414))
     
-    
+    def test_redeclared_in_if_stmt(self):
+        input = """
+        Function: main
+            Body:
+                If True Then 
+                    Var: i = 10;
+                    Var: i; 
+                EndIf.
+            EndBody.
+        """
+        expect = str(Redeclared(Variable(), "i"))
+        self.assertTrue(TestChecker.test(input, expect, 415))
+
+    def test_undeclared_var_in_if_stmt(self):
+        input = """
+        Function: main
+            Body:
+                If False Then
+                    i = 10;
+                EndIf.
+            EndBody.
+        """
+        expect = str(Undeclared(Identifier(), "i"))
+        self.assertTrue(TestChecker.test(input, expect, 416))
 
 
 

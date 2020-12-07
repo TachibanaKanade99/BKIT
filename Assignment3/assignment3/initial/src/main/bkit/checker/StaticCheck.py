@@ -282,6 +282,70 @@ class StaticChecker(BaseVisitor):
         elif lhs.opType != rhs.opType:
             raise TypeMismatchInStatement(ast)
 
+    def visitIf(self, ast, param):
+        decl_lst = param
+        ifthen_stmt_lst = ast.ifthenStmt
+        else_stmt_lst = ast.elseStmt
+
+        # visit if and elseif stmts:
+        for ifthen_stmt in ifthen_stmt_lst:
+            # visit expression:
+            expr = ifthen_stmt[0].accept(self, decl_lst)
+
+            if expr.opType != bool:
+                raise TypeMismatchInStatement(ast)
+
+            # visit var_decls:
+            local_lst = []
+            for x in ifthen_stmt[1]:
+                decl = x.accept(self, [local_lst])
+                local_lst.append(decl)
+            
+            # visit stmts:
+            new_decl_lst = decl_lst.copy()
+            new_decl_lst = [local_lst] + new_decl_lst
+
+            for y in ifthen_stmt[2]:
+                stmt = y.accept(self, new_decl_lst)
+
+    def visitFor(self, ast, param):
+        decl_lst = param
+        index = ast.idx1.accept(self, decl_lst)
+        expr_1 = ast.expr1.accept(self, decl_lst)
+        expr_2 = ast.expr2.accept(self, decl_lst)
+        expr_3 = ast.expr3.accept(self, decl_lst)
+        var_decl_lst = ast.loop[0]
+        stmt_lst = ast.loop[1]
+
+        # check type of index:
+        if index.opType != int:
+            raise TypeMismatchInStatement(ast)
+        
+        # check type of expression 1:
+        if expr_1.opType != int:
+            raise TypeMismatchInStatement(ast)
+
+        # check type of expression 2:
+        if expr_2.opType != bool:
+            raise TypeMismatchInStatement(ast)
+
+        # check type of expression 3:
+        if expr_3.opType != int:
+            raise TypeMismatchInStatement(ast)
+
+        # visit var_decls:
+        local_lst = []
+        for x in var_decl_lst:
+            decl = x.accept(self, [local_lst])
+            local_lst.append(decl)
+
+        # visit stmts:
+        new_decl_lst = decl_lst.copy()
+        new_decl_lst = [local_lst] + new_decl_lst
+        for y in stmt_lst:
+            stmt = y.accept(self, new_decl_lst)
+    
+
     def visitId(self, ast, param):
         decl_lst = param
         flatten_decl_lst = []
