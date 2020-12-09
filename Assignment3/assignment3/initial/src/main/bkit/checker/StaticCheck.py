@@ -59,7 +59,7 @@ class StaticChecker(BaseVisitor):
         self.ast = ast
         self.global_envi = [
             Symbol("int_of_float",MType([FloatType()],IntType())),
-            Symbol("float_of_int",MType([IntType()],FloatType())),
+            Symbol("float_to_int",MType([IntType()],FloatType())),
             Symbol("int_of_string",MType([StringType()],IntType())),
             Symbol("string_of_int",MType([IntType()],StringType())),
             Symbol("float_of_string",MType([StringType()],FloatType())),
@@ -68,7 +68,7 @@ class StaticChecker(BaseVisitor):
             Symbol("string_of_bool",MType([BoolType()],StringType())),
             Symbol("read",MType([],StringType())),
             Symbol("printLn",MType([],VoidType())),
-            Symbol("printStr",MType([StringType()],VoidType())),
+            Symbol("print",MType([StringType()],VoidType())),
             Symbol("printStrLn",MType([StringType()],VoidType()))]                           
    
     def check(self):
@@ -81,9 +81,14 @@ class StaticChecker(BaseVisitor):
             decl = x.accept(self, decl_lst)
             decl_lst[0].append(decl)
 
+        # Check if it exists function main:
+        isMain = list(filter(lambda x: x.opKind == "function" and x.opName == "main", decl_lst[0]))
+        if len(isMain) == 0:
+            raise NoEntryPoint()        
+
         # check only:
-        for x in decl_lst[0]:
-            print(x.opName, " ", x.opType)
+        for y in decl_lst[0]:
+            print(y.opName, " ", y.opType)
 
     def visitVarDecl(self, ast, param):
         decl_lst = param
@@ -143,7 +148,11 @@ class StaticChecker(BaseVisitor):
         new_decl_lst = [local_lst] + new_decl_lst
 
         for z in ast.body[1]:
-            stmt = z.accept(self, new_decl_lst)
+            # check if stmt is Return:
+            if isinstance(z, Return):
+                stmt = z.accept(self, new_decl_lst+[func_type])
+            else:
+                stmt = z.accept(self, new_decl_lst)
 
         return Operand(func_name, func_type, "function", param_lst)
 
@@ -223,15 +232,14 @@ class StaticChecker(BaseVisitor):
             if expr.opType is not bool:
                 raise TypeMismatchInExpression(ast)
             return Operand(None, bool, "un_op", None)
+
+    def visitArrayCell(self, ast, param):
+        return None
     
     def visitCallExpr(self, ast, param):
         decl_lst = param
         func = ast.method.accept(self, decl_lst+["func_call"])
         func.opKind = "func_call"
-
-        # infer type for function:
-        if len(func.param_lst) > 0:
-            func.opType = func.param_lst[0].opType
 
         # visit arguments in func_call:
         arg_lst = []
@@ -239,23 +247,46 @@ class StaticChecker(BaseVisitor):
             arg = x.accept(self, decl_lst)
             arg_lst.append(arg)
 
+        if len(arg_lst) > 0:
+            func.opType = arg_lst[0].opType
+
+        # check number of argument:
         if len(func.param_lst) != len(arg_lst):
             raise TypeMismatchInExpression(ast)
+
+        # check type of arguments:
+        for i in range(len(arg_lst)):
+            if arg_lst[i].opType is None and func.param_lst[i].opType is not None:
+                arg_lst[i].opType = func.param_lst[i].opType
+            else:
+                if func.param_lst[i].opType is None:
+                    func.param_lst[i].opType = arg_lst[i].opType
+                else:
+                    if arg_lst[i].opType != func.param_lst[i].opType:
+                        arg_lst[i].opType = None
+
+        return Operand(None, func.opType, "func_call", arg_lst)
 
     def visitCallStmt(self, ast, param):
         decl_lst = param
         func = ast.method.accept(self, decl_lst+["func_call"])
         func.opKind = "call_stmt"
 
-        # infer type for function:
-        if len(func.param_lst) > 0:
-            func.opType = func.param_lst[0].opType
+        # check if type of function is inferred:
+        if func.opType is not None:
+            raise TypeCannotBeInferred(ast)
+        else:
+            func.opType = None
 
         # visit arguments in call stmt:
         arg_lst = []
         for x in ast.param:
             arg = x.accept(self, decl_lst)
             arg_lst.append(arg)
+        
+        # Test only:
+        for arg in arg_lst:
+            print(arg.opName)
 
         # check number of arguments:
         if len(func.param_lst) != len(arg_lst):
@@ -263,8 +294,17 @@ class StaticChecker(BaseVisitor):
             
         # check type of arguments:
         for i in range(len(arg_lst)):
-            if arg_lst[i].opType != func.param_lst[i].opType:
-                raise TypeCannotBeInferred(ast)
+            if arg_lst[i].opType is None:
+                if func.param_lst[i].opType is None:
+                    raise TypeCannotBeInferred(ast)
+                else:
+                    arg_lst[i].opType = func.param_lst[i].opType
+            else:
+                if func.param_lst[i].opType is None:
+                    func.param_lst[i].opType = arg_lst[i].opType
+                else:
+                    if arg_lst[i].opType != func.param_lst[i].opType:
+                        raise TypeCannotBeInferred(ast)
         
 
     def visitAssign(self, ast, param):
@@ -293,7 +333,10 @@ class StaticChecker(BaseVisitor):
             expr = ifthen_stmt[0].accept(self, decl_lst)
 
             if expr.opType != bool:
-                raise TypeMismatchInStatement(ast)
+                if expr.opType is None:
+                    expr.opType = bool
+                else:
+                    raise TypeMismatchInStatement(ast)
 
             # visit var_decls:
             local_lst = []
@@ -351,7 +394,66 @@ class StaticChecker(BaseVisitor):
             stmt = y.accept(self, new_decl_lst)
     
     def visitDowhile(self, ast, param):
-        return None
+        decl_lst = param
+        var_decl_lst = ast.sl[0]
+        stmt_lst = ast.sl[1]
+        expr = ast.exp.accept(self, decl_lst)
+
+        # visit var_decl_lst
+        local_lst = []
+        for x in var_decl_lst:
+            decl = x.accept(self, [local_lst])
+            local_lst.append(decl)
+
+        # visit stmt_lst:
+        new_decl_lst = decl_lst.copy()
+        new_decl_lst = [local_lst] + new_decl_lst
+        for y in stmt_lst:
+            stmt = y.accept(self, new_decl_lst)
+
+        # check type of expr:
+        if expr.opType != bool:
+            if expr.opType is None:
+                expr.opType = bool
+            else:
+                raise TypeMismatchInStatement(ast)
+
+    def visitWhile(self, ast, param):
+        decl_lst = param
+        expr = ast.exp.accept(self, decl_lst)
+        var_decl_lst = ast.sl[0]
+        stmt_lst = ast.sl[1]
+
+        # check type of expr:
+        if expr.opType != bool:
+            if expr.opType is None:
+                expr.opType = bool
+            else:
+                raise TypeMismatchInStatement(ast)
+
+        # visit var_decl_lst
+        local_lst = []
+        for x in var_decl_lst:
+            decl = x.accept(self, [local_lst])
+            local_lst.append(decl)
+
+        # visit stmt_lst:
+        new_decl_lst = decl_lst.copy()
+        new_decl_lst = [local_lst] + new_decl_lst
+        for y in stmt_lst:
+            stmt = y.accept(self, new_decl_lst)
+
+    def visitReturn(self, ast, param):
+        decl_lst = param[:-1]
+        func_type = param[-1]
+        expr = ast.expr.accept(self, decl_lst)
+
+        if func_type is None:
+            if expr is not None:
+                raise TypeMismatchInStatement(ast)
+        else:
+            if expr.opType != func_type:
+                raise TypeMismatchInStatement(ast)
 
     def visitId(self, ast, param):
         decl_lst = param
