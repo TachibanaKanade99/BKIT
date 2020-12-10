@@ -234,12 +234,29 @@ class StaticChecker(BaseVisitor):
             return Operand(None, bool, "un_op", None)
 
     def visitArrayCell(self, ast, param):
-        return None
+        decl_lst = param
+        arr = ast.arr.accept(self, decl_lst)
+        index_lst = []
+
+        if arr.opType != "array_type":
+            raise TypeMismatchInExpression(ast)
+
+        # visit index_lst:
+        for x in ast.idx:
+            index = x.accept(self, decl_lst)
+            index_lst.append(index)
+
+        # check if each index has type is int:
+        for index in index_lst:
+            if index.opType != int:
+                raise TypeMismatchInExpression(ast)
+
+        return Operand(arr.opName, arr.opType, "array_cell", index_lst)
+
     
     def visitCallExpr(self, ast, param):
         decl_lst = param
         func = ast.method.accept(self, decl_lst+["func_call"])
-        func.opKind = "func_call"
 
         # visit arguments in func_call:
         arg_lst = []
@@ -247,8 +264,10 @@ class StaticChecker(BaseVisitor):
             arg = x.accept(self, decl_lst)
             arg_lst.append(arg)
 
-        if len(arg_lst) > 0:
-            func.opType = arg_lst[0].opType
+        # Infer type for func_call:
+        if func.opType is None:
+            if len(arg_lst) > 0:
+                func.opType = arg_lst[0].opType        
 
         # check number of argument:
         if len(func.param_lst) != len(arg_lst):
@@ -274,9 +293,9 @@ class StaticChecker(BaseVisitor):
 
         # check if type of function is inferred:
         if func.opType is not None:
-            raise TypeCannotBeInferred(ast)
+            raise TypeMismatchInStatement(ast)
         else:
-            func.opType = None
+            func.opType = "void_type"
 
         # visit arguments in call stmt:
         arg_lst = []
@@ -285,8 +304,8 @@ class StaticChecker(BaseVisitor):
             arg_lst.append(arg)
         
         # Test only:
-        for arg in arg_lst:
-            print(arg.opName)
+        # for arg in arg_lst:
+        #     print(arg.opName)
 
         # check number of arguments:
         if len(func.param_lst) != len(arg_lst):
@@ -311,45 +330,65 @@ class StaticChecker(BaseVisitor):
         decl_lst = param
         lhs = ast.lhs.accept(self, decl_lst)
         rhs = ast.rhs.accept(self, decl_lst)
+        # print(lhs.opType, rhs.opType)
 
         # Check type of lhs and rhs:
         if lhs.opType is None and rhs.opType is None:
             raise TypeCannotBeInferred(ast)
         elif lhs.opType is None and rhs.opType is not None:
             lhs.opType = rhs.opType
-        elif lhs.opType is not None and rhs.opType is None:
-            rhs.opType = lhs.opType
+        elif lhs.opType is not None:
+            if lhs.opType == "void_type":
+                raise TypeMismatchInStatement(ast)    
+            else:
+                if rhs.opType is None:
+                    rhs.opType = lhs.opType
         elif lhs.opType != rhs.opType:
             raise TypeMismatchInStatement(ast)
 
     def visitIf(self, ast, param):
         decl_lst = param
         ifthen_stmt_lst = ast.ifthenStmt
-        else_stmt_lst = ast.elseStmt
+        else_stmt = ast.elseStmt
 
         # visit if and elseif stmts:
         for ifthen_stmt in ifthen_stmt_lst:
             # visit expression:
             expr = ifthen_stmt[0].accept(self, decl_lst)
 
-            if expr.opType != bool:
-                if expr.opType is None:
-                    expr.opType = bool
-                else:
-                    raise TypeMismatchInStatement(ast)
+            if expr.opType is None:
+                expr.opType = bool
 
-            # visit var_decls:
+            if expr.opType != bool:
+                raise TypeMismatchInStatement(ast)
+
+            # visit var_decl_lst:
             local_lst = []
             for x in ifthen_stmt[1]:
                 decl = x.accept(self, [local_lst])
                 local_lst.append(decl)
             
-            # visit stmts:
+            # visit stmt_lst:
             new_decl_lst = decl_lst.copy()
             new_decl_lst = [local_lst] + new_decl_lst
 
             for y in ifthen_stmt[2]:
                 stmt = y.accept(self, new_decl_lst)
+        
+        # visit else stmt:
+
+        # visit var_decl_lst:
+        local_lst = []
+        for x in else_stmt[0]:
+            decl = x.accept(self, [local_lst])
+            local_lst.append(decl)
+        
+        # visit stmt_lst:
+        new_decl_lst = decl_lst.copy()
+        new_decl_lst = [local_lst] + new_decl_lst
+
+        for y in else_stmt[1]:
+            stmt = y.accept(self, new_decl_lst)
 
     def visitFor(self, ast, param):
         decl_lst = param
@@ -360,9 +399,15 @@ class StaticChecker(BaseVisitor):
         var_decl_lst = ast.loop[0]
         stmt_lst = ast.loop[1]
 
-        # infer type for index if its type is None:
+        # infer type for index, expr_1,2,3 if their type is None:
         if index.opType is None:
             index.opType = int
+        if expr_1.opType is None:
+            expr_1.opType = int
+        if expr_2.opType is None:
+            expr_2.opType = bool
+        if expr_3.opType is None:
+            expr_3.opType = int
 
         # check type of index:        
         if index.opType != int:
@@ -371,7 +416,6 @@ class StaticChecker(BaseVisitor):
         # check type of expression 1:
         if expr_1.opType != int:
             raise TypeMismatchInStatement(ast)
-            print("Hello World!")
         
         # check type of expression 2:
         if expr_2.opType != bool:
@@ -412,6 +456,9 @@ class StaticChecker(BaseVisitor):
             stmt = y.accept(self, new_decl_lst)
 
         # check type of expr:
+        if expr.opType is None:
+            expr.opType = bool
+
         if expr.opType != bool:
             if expr.opType is None:
                 expr.opType = bool
@@ -425,6 +472,9 @@ class StaticChecker(BaseVisitor):
         stmt_lst = ast.sl[1]
 
         # check type of expr:
+        if expr.opType is None:
+            expr.opType = bool
+
         if expr.opType != bool:
             if expr.opType is None:
                 expr.opType = bool
