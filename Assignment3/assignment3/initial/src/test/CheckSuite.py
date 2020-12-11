@@ -394,8 +394,9 @@ class CheckSuite(unittest.TestCase):
         Var: a[10] = {1, 2, 3};
         Function: main
             Body:
-                Var: b;
-                b[10] = a[0];
+                Var: b = 1;
+                b[10] = a[0] + {1};
+
             EndBody.
         """
         expect = str(TypeMismatchInExpression(ArrayCell(Id("b"), [IntLiteral(10)])))
@@ -498,4 +499,99 @@ class CheckSuite(unittest.TestCase):
         """
         expect = str(TypeMismatchInExpression(BinaryOp("+", Id("i"), CallExpr(Id("foo"), [Id("i")]))))
         self.assertTrue(TestChecker.test(input, expect, 433))
+
+    def test_call_function_before_declar(self):
+        input = """
+        Function: main
+            Body:
+                foo();
+            EndBody.
+        Function: foo
+            Body:
+            EndBody.
+        """
+        expect = str()
+        self.assertTrue(TestChecker.test(input, expect, 434))
+
+    def test_call_global_var_before_declar(self):
+        input = """
+        ** Var: a; **
+        Function: main
+            Body:
+                foo(a);
+            EndBody.
+        Function: foo
+            Parameter: b
+            Body:
+            EndBody.
+        """
+        expect = str(Undeclared(Identifier(), "a"))
+        self.assertTrue(TestChecker.test(input, expect, 435))
+
+    def test_simple_type_mismatch_array_cell(self):
+        input = """
+        Function: foo
+            Parameter: a, b
+            Body:
+            EndBody.
+        Function: main
+            Body:
+                Var: a, b[10] = 1;
+                foo(a + b[10]);
+            EndBody.
+        """
+        expect = str(TypeMismatchInExpression(ArrayCell(Id("b"), [IntLiteral(10)])))
+        self.assertTrue(TestChecker.test(input, expect, 436))
+
+    def test_plue_op_between_None_op(self):
+        input = """
+        Function: main
+            Body:
+                Var: a, b;
+                a = a + b;
+            EndBody.
+        """
+        expect = str()
+        self.assertTrue(TestChecker.test(input, expect, 437))
+
+    def test_type_mismatch_when_op_type_is_inferred(self):
+        input = """
+        Function: main
+            Body:
+                Var: a, b;
+                Var: c = 12.3;
+                a = a + b;
+                c = c +. a;
+            EndBody.
+        """
+        expect = str(TypeMismatchInExpression(BinaryOp("+.", Id("c"), Id("a"))))
+        self.assertTrue(TestChecker.test(input, expect, 438))
+
+    def test_call_stmt_infer_inside_itself_1(self):
+        input = """
+        Function: main
+            Parameter: x
+            Body:
+                Var: y = 1;
+                x = 1.0;
+                main(y);
+            EndBody.
+        """
+        expect = str(TypeMismatchInStatement(CallStmt(Id("main"), [Id("y")])))
+        self.assertTrue(TestChecker.test(input, expect, 439))
+
+    def test_call_stmt_infer_inside_itself_2(self):
+        input = """
+        Function: main
+            Parameter: x
+            Body:
+                Var: y = 1;
+                main(y);
+                x = 1.0;
+            EndBody.
+        """
+        expect = str(TypeMismatchInStatement(Assign(Id("x"), FloatLiteral(1.0))))
+        self.assertTrue(TestChecker.test(input, expect, 440))
+
+    
     
