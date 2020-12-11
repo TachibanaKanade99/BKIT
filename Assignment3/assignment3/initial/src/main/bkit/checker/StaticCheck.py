@@ -181,6 +181,7 @@ class StaticChecker(BaseVisitor):
         op = ast.op
         left_expr = ast.left.accept(self, decl_lst)
         right_expr = ast.right.accept(self, decl_lst)
+        # print(left_expr.opType, right_expr.opType)
 
         if left_expr.opType is None and right_expr.opType is not None:
             left_expr.opType = right_expr.opType
@@ -193,6 +194,7 @@ class StaticChecker(BaseVisitor):
                 right_expr.opType = int
             if left_expr.opType is not int or right_expr.opType is not int:
                 raise TypeMismatchInExpression(ast)
+
             return Operand(None, int, "bin_op", None)
 
         if op == '+.' or op == '-.' or op == '*.' or op == '\.':
@@ -305,12 +307,18 @@ class StaticChecker(BaseVisitor):
                     if arg_lst[i].opType != func.param_lst[i].opType:
                         raise TypeMismatchInExpression(ast)
 
-        return Operand(None, func.opType, "func_call", arg_lst)
+        return func
 
     def visitCallStmt(self, ast, param):
         decl_lst = param
         func = ast.method.accept(self, decl_lst+["func_call"])
         func.opKind = "call_stmt"
+
+        # check if type of function is inferred:
+        if func.opType is not None:
+            raise TypeMismatchInStatement(ast)
+        else:
+            func.opType = "void_type"
 
         # visit arguments in call stmt:
         arg_lst = []
@@ -340,12 +348,6 @@ class StaticChecker(BaseVisitor):
                     if arg_lst[i].opType != func.param_lst[i].opType:
                         raise TypeMismatchInStatement(ast)
 
-        # check if type of function is inferred:
-        if func.opType is not None:
-            raise TypeMismatchInStatement(ast)
-        else:
-            func.opType = "void_type"
-
     def visitAssign(self, ast, param):
         decl_lst = param
         lhs = ast.lhs.accept(self, decl_lst)
@@ -355,17 +357,13 @@ class StaticChecker(BaseVisitor):
         # Check type of lhs and rhs:
         if lhs.opType is None and rhs.opType is None:
             raise TypeCannotBeInferred(ast)
-        if lhs.opType is None and rhs.opType is not None:
-            if rhs.opType == "void_type":
-                raise TypeMismatchInStatement(ast)
-            else:
-                lhs.opType = rhs.opType
-        if lhs.opType is not None and rhs.opType is None:
+        if lhs.opType is not None:
             if lhs.opType == "void_type":
-                raise TypeMismatchInStatement(ast)    
-            else:
-                if rhs.opType is None:
-                    rhs.opType = lhs.opType
+                raise TypeMismatchInStatement(ast)
+            if rhs.opType is None:
+                rhs.opType = lhs.opType
+        if lhs.opType is None and rhs.opType is not None:
+            lhs.opType = rhs.opType
         if lhs.opType != rhs.opType:
             raise TypeMismatchInStatement(ast)
 

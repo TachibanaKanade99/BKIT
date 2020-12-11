@@ -593,5 +593,56 @@ class CheckSuite(unittest.TestCase):
         expect = str(TypeMismatchInStatement(Assign(Id("x"), FloatLiteral(1.0))))
         self.assertTrue(TestChecker.test(input, expect, 440))
 
-    
-    
+    def test_infer_type_for_func_call(self):
+        input = """
+        Function: foo
+            Body:
+            EndBody.
+        Function: main
+            Body:
+                Var: a;
+                a = a + foo();
+                foo();
+            EndBody.
+        """
+        expect = str(TypeMismatchInStatement(CallStmt(Id("foo"), [])))
+        self.assertTrue(TestChecker.test(input, expect, 441))
+
+    def test_simple_type_cannot_inferred_assign_stmt(self):
+        input = """
+        Function: main
+            Body:
+                Var: x, y;
+                x = y;
+            EndBody.
+        """
+        expect = str(TypeCannotBeInferred(Assign(Id("x"),Id("y"))))
+        self.assertTrue(TestChecker.test(input, expect, 442))
+
+    def test_lhs_is_void_type_assign_stmt(self):
+        input = """
+        Function: foo1
+            Body:
+            EndBody.
+        Function: foo2
+            Body:
+            EndBody.
+        Function: main
+            Body:
+                foo1();
+                foo1() = foo2();
+            EndBody.
+        """
+        expect = str(TypeMismatchInStatement(Assign(CallExpr(Id("foo1"), []), CallExpr(Id("foo2"), []))))
+        self.assertTrue(TestChecker.test(input, expect, 443))
+
+    def test_both_side_different_type_assign_stmt(self):
+        input = """
+        Function: main
+            Body:
+                Var: a = 1, b = "Hi";
+                a = b;
+            EndBody.
+        """
+        expect = str(TypeMismatchInStatement(Assign(Id("a"), Id("b"))))
+        self.assertTrue(TestChecker.test(input, expect, 444))
