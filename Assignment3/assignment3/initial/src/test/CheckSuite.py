@@ -646,3 +646,118 @@ class CheckSuite(unittest.TestCase):
         """
         expect = str(TypeMismatchInStatement(Assign(Id("a"), Id("b"))))
         self.assertTrue(TestChecker.test(input, expect, 444))
+
+    def test_param_returned_by_binary_op(self):
+        input = """
+        Function: foo
+            Parameter: a, b, c
+            Body:
+                ** a = 1;
+                b = 2;
+                c = "Hey"; **
+            EndBody.
+        Function: foo1
+            Parameter: a
+            Body:
+            EndBody.
+        Function: main
+            Body:
+                Var: a;
+                a = foo(1, 2, "Hmm") + foo1(a);
+            EndBody.
+        """
+        expect = str(TypeCannotBeInferred(Assign(Id("a"), BinaryOp("+", CallExpr(Id("foo"), [IntLiteral(1), IntLiteral(2), StringLiteral("Hmm")]), CallExpr(Id("foo1"), [Id("a")])))))
+        self.assertTrue(TestChecker.test(input, expect, 445))
+
+    def test_simple_binary_op_has_type_cannot_inferred(self):
+        input = """
+        Function: main
+            Parameter: a
+            Body:
+                Var: b = 10;
+                b = main(a);
+            EndBody.
+        """
+        expect = str(TypeCannotBeInferred(Assign(Id("b"), CallExpr(Id("main"), [Id("a")]))))
+        self.assertTrue(TestChecker.test(input, expect, 446))
+
+    def test_simple_unary_op_type_cannot_inferred(self):
+        input = """
+        Function: main
+            Body:
+                Var: a, x;
+                a = -foo1(x);
+            EndBody.
+        Function: foo1
+            Parameter: a
+            Body:
+            EndBody.
+        """
+        expect = str(TypeCannotBeInferred(Assign(Id("a"), UnaryOp("-", CallExpr(Id("foo1"), [Id("x")])))))
+        self.assertTrue(TestChecker.test(input, expect, 447))
+
+    def test_type_mismatch_float_bin_op(self):
+        input = """
+        Function: main
+            Parameter: a
+            Body:
+                Var: b = 12.3, c = 10;
+                a = a +. a *. -b;
+            EndBody.
+        """
+        expect = str(TypeMismatchInExpression(UnaryOp("-", Id("b"))))
+        self.assertTrue(TestChecker.test(input, expect, 448))
+
+    def test_same_name_function_var(self):
+        input = """
+        Function: main
+            Parameter: foo
+            Body:
+                Var: foo = 0;
+                foo = foo + foo();
+            EndBody.
+        Function: foo
+            Body:
+            EndBody.
+        """
+        expect = str(Redeclared(Variable(), "foo"))
+        self.assertTrue(TestChecker.test(input, expect, 449))
+
+    def test_simple_type_mismatch_logical_op(self):
+        input = """
+        Function: main
+            Body:
+                Var: a = True, b, c = 1;
+                a = a || a && b && c;
+            EndBody.
+        """
+        expect = str(TypeMismatchInExpression(BinaryOp("&&", BinaryOp("&&", BinaryOp("||", Id("a"), Id("a")), Id("b")),Id("c"))))
+        self.assertTrue(TestChecker.test(input, expect, 450))
+
+    def test_simple_int_eq_op(self):
+        input = """
+        Function: main
+            Body:
+                Var: a = 10;
+                Var: b = 20;
+                Var: c, res;
+                c = 12.45e-12 =/= 12.3;
+                res = a <. b;
+            EndBody.
+        """
+        expect = str(TypeMismatchInExpression(BinaryOp("<.", Id("a"), Id("b"))))
+        self.assertTrue(TestChecker.test(input, expect, 451))
+
+    def test_call_stmt_as_operand(self):
+        input = """
+        Function: main
+            Body:
+                Var: res = False;
+                main();
+                res = main() != 10;
+            EndBody.
+        """
+        expect = str(TypeMismatchInExpression(BinaryOp("!=", CallExpr(Id("main"), []), IntLiteral(10))))
+        self.assertTrue(TestChecker.test(input, expect, 452))
+
+    

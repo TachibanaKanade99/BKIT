@@ -95,7 +95,7 @@ class StaticChecker(BaseVisitor):
         for y in ast.decl:
             for func in func_lst:
                 if isinstance(y, FuncDecl) and y.name.name == func.opName:
-                    y.accept(self, decl_lst+["recheck"])
+                        y.accept(self, decl_lst+["recheck"])
             
         # check only:
         # for z in decl_lst[0]:
@@ -123,7 +123,7 @@ class StaticChecker(BaseVisitor):
         else:
             var_type = None
 
-        return Operand(var_name, var_type, "variable", None)
+        return Operand(var_name, var_type, "variable", [])
 
     def visitFuncDecl(self, ast, param):
         decl_lst = param
@@ -135,12 +135,18 @@ class StaticChecker(BaseVisitor):
         if isVisit is None:
             func_name = ast.name.accept(self, decl_lst+["funcdecl"])
             func_type = None
-            param_lst = []
 
             # Check redeclared function
             for decl in decl_lst[0]:
                 if func_name == decl.opName:
                     raise Redeclared(Function(), func_name)
+
+            # visit param:
+            param_lst = []
+            if len(ast.param) > 0:
+                for x in ast.param:
+                    param_decl = x.accept(self, [param_lst, "param"])
+                    param_lst.append(param_decl)
             
             return Operand(func_name, func_type, "function", param_lst)
         
@@ -151,16 +157,9 @@ class StaticChecker(BaseVisitor):
             new_decl_lst = decl_lst.copy()
             # new_decl_lst[0].append(Operand(func_name, func_type, "function", param_lst))
 
-            # visit param:
-            param_lst = func.param_lst
-            if len(ast.param) > 0:
-                for x in ast.param:
-                    param_decl = x.accept(self, [param_lst, "param"])
-                    param_lst.append(param_decl)
-
             # visit body[0]:
             # copy a new_lst
-            local_lst = param_lst.copy()
+            local_lst = func.param_lst.copy()
 
             for y in ast.body[0]:
                 decl = y.accept(self, [local_lst])
@@ -181,7 +180,25 @@ class StaticChecker(BaseVisitor):
         op = ast.op
         left_expr = ast.left.accept(self, decl_lst)
         right_expr = ast.right.accept(self, decl_lst)
-        # print(left_expr.opType, right_expr.opType)
+        param_lst = []
+        # print(left_expr.opName, left_expr.opType)
+        # print(right_expr.opName, right_expr.opType)
+
+        # Get all param of left_expr:
+        if len(left_expr.param_lst) > 0:
+            for param in left_expr.param_lst:
+                param_lst.append(param)
+        # Get all param of right_expr:
+        if len(right_expr.param_lst) > 0:
+            for param in right_expr.param_lst:
+                param_lst.append(param)
+
+        # Operand name:
+        operand_name = left_expr.opName + op + right_expr.opName
+
+        # Test param_lst returned:
+        # for param in param_lst:
+        #     print(param.opName, param.opType)
 
         if left_expr.opType is None and right_expr.opType is not None:
             left_expr.opType = right_expr.opType
@@ -194,8 +211,7 @@ class StaticChecker(BaseVisitor):
                 right_expr.opType = int
             if left_expr.opType is not int or right_expr.opType is not int:
                 raise TypeMismatchInExpression(ast)
-
-            return Operand(None, int, "bin_op", None)
+            return Operand(operand_name, int, "bin_op", param_lst)
 
         if op == '+.' or op == '-.' or op == '*.' or op == '\.':
             if left_expr.opType is None and right_expr.opType is None:
@@ -203,7 +219,7 @@ class StaticChecker(BaseVisitor):
                 right_expr.opType = float
             if left_expr.opType is not float or right_expr.opType is not float:
                 raise TypeMismatchInExpression(ast)    
-            return Operand(None, float, "bin_op", None)
+            return Operand(operand_name, float, "bin_op", param_lst)
 
         if op == '!' or op == '&&' or op == '||':
             if left_expr.opType is None and right_expr.opType is None:
@@ -211,7 +227,7 @@ class StaticChecker(BaseVisitor):
                 right_expr.opType = bool
             if left_expr.opType is not bool or right_expr.opType is not bool:
                 raise TypeMismatchInExpression(ast)
-            return Operand(None, bool, "bin_op", None)
+            return Operand(operand_name, bool, "bin_op", param_lst)
 
         if op == '==' or op == '!=' or op == '>' or op == '<' or op == '>=' or op == '<=':
             if left_expr.opType is None and right_expr.opType is None:
@@ -219,7 +235,7 @@ class StaticChecker(BaseVisitor):
                 right_expr.opType = int
             if left_expr.opType is not int or right_expr.opType is not int:
                 raise TypeMismatchInExpression(ast)
-            return Operand(None, bool, "bin_op", None)
+            return Operand(operand_name, bool, "bin_op", param_lst)
 
         if op == '=/=' or op == '<.' or op == '>.' or op == '<=.' or op == '>=.':
             if left_expr.opType is None and right_expr.opType is None:
@@ -227,33 +243,42 @@ class StaticChecker(BaseVisitor):
                 right_expr.opType = float
             if left_expr.opType is not float or right_expr.opType is not float:
                 raise TypeMismatchInExpression(ast)
-            return Operand(None, float, "bin_op", None)
+            return Operand(operand_name, float, "bin_op", param_lst)
 
     def visitUnaryOp(self, ast, param):
         decl_lst = param
         op = ast.op
         expr = ast.body.accept(self, decl_lst)
+        param_lst = []
+
+        # Get all param of expr:
+        if len(expr.param_lst) > 0:
+            for param in expr.param_lst:
+                param_lst.append(param)
+
+        # Operand name:
+        operand_name = op + expr.opName
 
         if op == '-':
             if expr.opType is None:
                 expr.opType = int
             if expr.opType is not int:
                 raise TypeMismatchInExpression(ast)
-            return Operand(None, int, "un_op", None)
+            return Operand(operand_name, int, "un_op", param_lst)
 
         if op == '-.':
             if expr.opType is None:
                 expr.opType = float
             if expr.opType is not float:
                 raise TypeMismatchInExpression(ast)
-            return Operand(None, float, "un_op", None)
+            return Operand(operand_name, float, "un_op", param_lst)
 
         if op == '!':
             if expr.opType is None:
                 expr.opType = bool
             if expr.opType is not bool:
                 raise TypeMismatchInExpression(ast)
-            return Operand(None, bool, "un_op", None)
+            return Operand(operand_name, bool, "un_op", param_lst)
 
     def visitArrayCell(self, ast, param):
         decl_lst = param
@@ -296,9 +321,7 @@ class StaticChecker(BaseVisitor):
         # check type of arguments:
         for i in range(len(arg_lst)):
             if arg_lst[i].opType is None:
-                if func.param_lst[i].opType is None:
-                    raise TypeCannotBeInferred(ast)
-                else:
+                if func.param_lst[i].opType is not None:
                     arg_lst[i].opType = func.param_lst[i].opType
             else:
                 if func.param_lst[i].opType is None:
@@ -306,7 +329,8 @@ class StaticChecker(BaseVisitor):
                 else:
                     if arg_lst[i].opType != func.param_lst[i].opType:
                         raise TypeMismatchInExpression(ast)
-
+        
+        func.param_lst = func.param_lst + arg_lst
         return func
 
     def visitCallStmt(self, ast, param):
@@ -364,8 +388,21 @@ class StaticChecker(BaseVisitor):
                 rhs.opType = lhs.opType
         if lhs.opType is None and rhs.opType is not None:
             lhs.opType = rhs.opType
+
         if lhs.opType != rhs.opType:
             raise TypeMismatchInStatement(ast)
+        else:
+            # Check all type inferred in lhs:
+            if len(lhs.param_lst) > 0:
+                for param in lhs.param_lst:
+                    if param.opType is None:
+                        raise TypeCannotBeInferred(ast)
+
+            # Check all type inferred in rhs:
+            if len(rhs.param_lst) > 0:
+                for param in rhs.param_lst:
+                    if param.opType is None:
+                        raise TypeCannotBeInferred(ast)
 
     def visitIf(self, ast, param):
         decl_lst = param
@@ -554,16 +591,16 @@ class StaticChecker(BaseVisitor):
 
     # Literal:
     def visitIntLiteral(self, ast, param):
-        return Operand(None, int, "literal", None)
+        return Operand(str(ast.value), int, "literal", [])
     
     def visitFloatLiteral(self, ast, param):
-        return Operand(None, float, "literal", None)
+        return Operand(str(ast.value), float, "literal", [])
     
     def visitBooleanLiteral(self, ast, param):
-        return Operand(None, bool, "literal", None)
+        return Operand(str(ast.value), bool, "literal", [])
     
     def visitStringLiteral(self, ast, param):
-        return Operand(None, str, "literal", None)
+        return Operand(str(ast.value), str, "literal", [])
 
     def visitArrayLiteral(self, ast, param):
         decl_lst = param
