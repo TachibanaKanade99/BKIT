@@ -760,4 +760,102 @@ class CheckSuite(unittest.TestCase):
         expect = str(TypeMismatchInExpression(BinaryOp("!=", CallExpr(Id("main"), []), IntLiteral(10))))
         self.assertTrue(TestChecker.test(input, expect, 452))
 
+    def test_simple_float_divide_op(self):
+        input = """
+        Function: main
+            Body:
+                Var: a;
+                Var: b = 10;
+                a = 12.0 \. 12.;
+                a = a \. b;
+            EndBody.
+        """
+        expect = str(TypeMismatchInExpression(BinaryOp("\.", Id("a"), Id("b"))))
+        self.assertTrue(TestChecker.test(input, expect, 453))
+
+    def test_simple_type_cannot_inferred_inside_un_op(self):
+        input = """
+        Function: main
+            Parameter: a
+            Body:
+                Var: b = 1.1, c = 20.;
+                b = -.c +. b *. -.main(a); 
+            EndBody.
+        """
+        expect = str(TypeCannotBeInferred(Assign(Id("b"), BinaryOp("+.", UnaryOp("-.", Id("c")), BinaryOp("*.", Id("b"), UnaryOp("-.", CallExpr(Id("main"), [Id("a")])))))))
+        self.assertTrue(TestChecker.test(input, expect, 454))
+
+    def test_type_cannot_inferred_call_stmt(self):
+        input = """
+        Function: main
+            Parameter: a
+            Body:
+                Var: x;
+                main(x);
+            EndBody.
+        """
+        expect = str(TypeCannotBeInferred(CallStmt(Id("main"), [Id("x")])))
+        self.assertTrue(TestChecker.test(input, expect, 455))
+
+    def test_call_expr_before_call_stmt(self):
+        input = """
+        Function: main
+            Body:
+                Var: a = 10;
+                main() = a;
+                main();
+            EndBody.
+        """
+        expect = str(TypeMismatchInStatement(CallStmt(Id("main"), [])))
+        self.assertTrue(TestChecker.test(input, expect, 456))
+
+    def test_diff_argument_func_call(self):
+        input = """
+        Function: main
+            Body:
+                Var: a = 12.;
+                a = main(1, 2, 3);
+            EndBody.
+        """
+        expect = str(TypeMismatchInExpression(CallExpr(Id("main"), [IntLiteral(1), IntLiteral(2), IntLiteral(3)])))
+        self.assertTrue(TestChecker.test(input, expect, 457))
+
+    def test_diff_argument_call_stmt(self):
+        input = """
+        Function: main
+            Body:
+                main(1, 2, 3);
+            EndBody.
+        """
+        expect = str(TypeMismatchInStatement(CallStmt(Id("main"), [IntLiteral(1), IntLiteral(2), IntLiteral(3)])))
+        self.assertTrue(TestChecker.test(input, expect, 458))
+
+    def test_one_lhs_is_None_assign_stmt(self):
+        input = """
+        Function: main
+            Body:
+                Var: a;
+                Var: b = 10;
+                a = b;
+                a = 12.1;
+            EndBody.
+        """
+        expect = str(TypeMismatchInStatement(Assign(Id("a"),FloatLiteral(12.1))))
+        self.assertTrue(TestChecker.test(input, expect, 459))
+
+    def test_one_rhs_is_None_assign_stmt(self):
+        input = """
+        Function: main
+            Body:
+                Var: a = 10;
+                Var: b;
+                a = b;
+                b = 12.11111;
+            EndBody.
+        """
+        expect = str(TypeMismatchInStatement(Assign(Id("b"),FloatLiteral(12.11111))))
+        self.assertTrue(TestChecker.test(input, expect, 460))
+    
+    
+
     
