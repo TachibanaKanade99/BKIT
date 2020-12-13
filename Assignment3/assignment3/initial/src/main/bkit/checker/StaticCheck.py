@@ -104,26 +104,34 @@ class StaticChecker(BaseVisitor):
     def visitVarDecl(self, ast, param):
         decl_lst = param
         var_name = ast.variable.accept(self, decl_lst+["vardecl"])
-        # var_dimension = ast.varDimen.accept(self, decl_lst)
+        var_dimension_lst = ast.varDimen
+        var_type = None
+        var_kind = None
 
         # Check redeclared variable:
         for decl in decl_lst[0]:
             if var_name == decl.opName:
-
-                if param[-1] is not None:
-                    if param[-1] == 'param':
-                        raise Redeclared(Parameter(), var_name)
-                
+                if param[-1] is not None and param[-1] == 'param':
+                    raise Redeclared(Parameter(), var_name)
                 raise Redeclared(Variable(), var_name)
         
         # Infer type for variable:
         if ast.varInit is not None:
             var_value = ast.varInit.accept(self, decl_lst)
-            var_type = var_value.opType
-        else:
-            var_type = None
+            
+            # array type:
+            if type(var_value.opType) == list:
+                var_kind = "composite_variable"
+                if len(var_dimension_lst) > 0:
+                    var_type = [type(var_dimension_lst[0]), var_value.opType]
+                else:
+                    var_type = [None, var_value.opType]
+            else:
+                var_kind = "scalar_variable"
+                var_type = var_value.opType
 
-        return Operand(var_name, var_type, "variable", [])
+        # print(var_name, var_type)
+        return Operand(var_name, var_type, var_kind, [])
 
     def visitFuncDecl(self, ast, param):
         decl_lst = param
@@ -167,13 +175,14 @@ class StaticChecker(BaseVisitor):
 
             # visit body[1]:
             new_decl_lst = [local_lst] + new_decl_lst
-
+            
             for z in ast.body[1]:
                 # check if stmt is Return:
-                if isinstance(z, Return):
-                    stmt = z.accept(self, new_decl_lst+[func.opType])
-                else:
-                    stmt = z.accept(self, new_decl_lst)
+                # if isinstance(z, Return):
+                #     stmt = z.accept(self, new_decl_lst+[func])
+                # else:
+                #     stmt = z.accept(self, new_decl_lst)
+                stmt = z.accept(self, new_decl_lst+[[func]])
 
     def visitBinaryOp(self, ast, param):
         decl_lst = param
@@ -243,7 +252,7 @@ class StaticChecker(BaseVisitor):
                 right_expr.opType = float
             if left_expr.opType is not float or right_expr.opType is not float:
                 raise TypeMismatchInExpression(ast)
-            return Operand(operand_name, float, "bin_op", param_lst)
+            return Operand(operand_name, bool, "bin_op", param_lst)
 
     def visitUnaryOp(self, ast, param):
         decl_lst = param
@@ -444,7 +453,6 @@ class StaticChecker(BaseVisitor):
         # visit stmt_lst:
         new_decl_lst = decl_lst.copy()
         new_decl_lst = [local_lst] + new_decl_lst
-
         for y in else_stmt[1]:
             stmt = y.accept(self, new_decl_lst)
 
@@ -553,16 +561,20 @@ class StaticChecker(BaseVisitor):
 
     def visitReturn(self, ast, param):
         decl_lst = param[:-1]
-        func_type = param[-1]
+        func = param[-1][0]
         expr = ast.expr.accept(self, decl_lst)
 
-        if func_type is None:
-            if expr is not None:
+        if func.opType is not None:
+            if func.opType == "void_type" and expr is not None:
+                raise TypeMismatchInStatement(ast)
+            if expr.opType != func.opType:
                 raise TypeMismatchInStatement(ast)
         else:
-            if expr.opType != func_type:
-                raise TypeMismatchInStatement(ast)
-
+            if expr.opType is None:
+                raise TypeCannotBeInferred(ast)
+            else:
+                func.opType = expr.opType
+        
     def visitId(self, ast, param):
         decl_lst = param
         flatten_decl_lst = []
@@ -604,12 +616,16 @@ class StaticChecker(BaseVisitor):
 
     def visitArrayLiteral(self, ast, param):
         decl_lst = param
+        index_type = None
+        elem_type = None
         lit_lst = []
+        
         for x in ast.value:
             lit = x.accept(self, decl_lst)
             lit_lst.append(lit)
-        
-        return Operand(None, "array_type", "literal", lit_lst)
+        elem_type = lit_lst[0].opType
+
+        return Operand(None, [index_type, elem_type], "literal", [])
     
 
 
