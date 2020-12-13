@@ -395,11 +395,11 @@ class CheckSuite(unittest.TestCase):
         Function: main
             Body:
                 Var: b = 1;
-                b[10] = a[0] + {1};
-
+                b = a[0] + 1;
+                c = b;
             EndBody.
         """
-        expect = str(TypeMismatchInExpression(ArrayCell(Id("b"), [IntLiteral(10)])))
+        expect = str(Undeclared(Identifier(), "c"))
         self.assertTrue(TestChecker.test(input, expect, 426))
 
     def test_expr_3_in_for_not_int_type(self):
@@ -531,16 +531,16 @@ class CheckSuite(unittest.TestCase):
     def test_simple_type_mismatch_array_cell(self):
         input = """
         Function: foo
-            Parameter: a, b
+            Parameter: a, b[10]
             Body:
             EndBody.
         Function: main
             Body:
-                Var: a, b[10] = 1;
-                foo(a + b[10]);
+                Var: a = 1, b[10] = {1};
+                foo(a, b[1.2]);
             EndBody.
         """
-        expect = str(TypeMismatchInExpression(ArrayCell(Id("b"), [IntLiteral(10)])))
+        expect = str(TypeMismatchInExpression(ArrayCell(Id("b"), [FloatLiteral(1.2)])))
         self.assertTrue(TestChecker.test(input, expect, 436))
 
     def test_plue_op_between_None_op(self):
@@ -711,16 +711,16 @@ class CheckSuite(unittest.TestCase):
     def test_same_name_function_var(self):
         input = """
         Function: main
-            Parameter: foo
             Body:
                 Var: foo = 0;
                 foo = foo + foo();
-            EndBody.
+                c = foo;
+                EndBody.
         Function: foo
             Body:
             EndBody.
         """
-        expect = str(Redeclared(Variable(), "foo"))
+        expect = str(Undeclared(Identifier(), "c"))
         self.assertTrue(TestChecker.test(input, expect, 449))
 
     def test_simple_type_mismatch_logical_op(self):
@@ -1085,6 +1085,77 @@ class CheckSuite(unittest.TestCase):
         expect = str(TypeMismatchInExpression(BinaryOp("+", IntLiteral(1), BinaryOp("=/=", FloatLiteral(2.3), FloatLiteral(3.4)))))
         self.assertTrue(TestChecker.test(input, expect, 477))
 
+    def test_simple_no_entry_point(self):
+        input = """
+        Var: main;
+        Function: foo
+            Body:
+            EndBody.
+        Function: foo1
+            Body:
+            EndBody.
+        Function: foo2
+            Body:
+            EndBody.
+        """
+        expect = str(NoEntryPoint())
+        self.assertTrue(TestChecker.test(input ,expect, 478))
+
+    def test_diff_in_param_func_call(self):
+        input = """
+        Function: main
+            Body:
+                Var: a;
+                a = main(1, a) + 10;
+            EndBody.
+        """
+        expect = str(TypeMismatchInExpression(CallExpr(Id("main"), [IntLiteral(1), Id("a")])))
+        self.assertTrue(TestChecker.test(input, expect, 479))
+
+    def test_call_return_in_for_stmt(self):
+        input = """
+        Function: main
+            Body:
+                Var: i;
+                For (i = 1, i < 10, i +1 ) Do
+                    If (i > 5) Then Return i;
+                    Else Return i + 1;
+                    EndIf.
+                EndFor.
+                a = i;
+            EndBody.
+        """
+        expect = str(Undeclared(Identifier(), "a"))
+        self.assertTrue(TestChecker.test(input, expect, 480))
+
+    def test_type_mismatch_in_var(self):
+        input = """
+        Function: main
+            Body:
+                Var: a, b[0] = {1, 2};
+                a = b[0] + c;
+            EndBody.
+        """
+        expect = str(Undeclared(Identifier(), "c"))
+        self.assertTrue(TestChecker.test(input, expect, 481))
+
+    def test_simple_type_cannot_inferred_array_cell(self):
+        input = """
+        Function: foo
+            Parameter: a
+            Body:
+            EndBody.
+        Function: main
+            Body:
+                Var: a = 1;
+                a = foo(1)[1];
+            EndBody.
+        """
+        expect = str(TypeCannotBeInferred(Assign(Id("a"), ArrayCell(CallExpr(Id("foo"),[IntLiteral(1)]),[IntLiteral(1)]))))
+        self.assertTrue(TestChecker.test(input, expect, 482))
+
+    
+    
 
     
     
