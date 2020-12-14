@@ -312,12 +312,17 @@ class StaticChecker(BaseVisitor):
         # check if arr is not array cell:
         if not isinstance(arr.opType, ArrayType):
             raise TypeMismatchInExpression(ast)
-
+        
+        param_lst = []
         # visit index_lst:
         for x in idx_lst:
             index = x.accept(self, decl_lst)
             index_lst.append(index)
 
+            # check param in each index
+            if len(index.param_lst) > 0:
+                for param in index.param_lst:
+                    param_lst.append(param)
         # check index number:
         if len(index_lst) != len(arr.opType.dimen):
             # print(arr.opType.dimen)
@@ -332,7 +337,7 @@ class StaticChecker(BaseVisitor):
                 if index_lst[i].opType != arr.opType.dimen[i].opType:
                     raise TypeMismatchInExpression(ast)
         
-        arr.param_lst = index_lst
+        arr.param_lst = index_lst + param_lst
         # print(arr.opName, arr.opType)
         return Operand(arr.opName, arr.opType.eletype, arr.opKind, arr.param_lst)
 
@@ -341,11 +346,17 @@ class StaticChecker(BaseVisitor):
         decl_lst = param
         func = ast.method.accept(self, decl_lst+["func_call"])
 
+        # check if args have param left:
+        param_lst = []
         # visit arguments in func_call:
         arg_lst = []
         for x in ast.param:
             arg = x.accept(self, decl_lst)
-            arg_lst.append(arg)      
+            arg_lst.append(arg)
+
+            if len(arg.param_lst) > 0:
+                for param in arg.param_lst:
+                    param_lst.append(param)
 
         # check number of argument:
         if len(func.param_lst) != len(arg_lst):
@@ -363,7 +374,7 @@ class StaticChecker(BaseVisitor):
                     if arg_lst[i].opType != func.param_lst[i].opType:
                         raise TypeMismatchInExpression(ast)
         
-        func.param_lst = arg_lst
+        func.param_lst = arg_lst + param_lst
         return func
 
     def visitCallStmt(self, ast, param):
@@ -389,7 +400,8 @@ class StaticChecker(BaseVisitor):
         # check number of arguments:
         if len(func.param_lst) != len(arg_lst):
             raise TypeMismatchInStatement(ast)
-            
+        
+        print(arg_lst[0].opType, func.param_lst[0].opType)
         # check type of arguments:
         for i in range(len(arg_lst)):
             if arg_lst[i].opType is None:
@@ -401,6 +413,19 @@ class StaticChecker(BaseVisitor):
                 if func.param_lst[i].opType is None:
                     func.param_lst[i].opType = arg_lst[i].opType
                 else:
+                    if isinstance(arg_lst[i].opType, ArrayType)and isinstance(func.param_lst[i].opType, ArrayType):
+                        if arg_lst[i].opType.eletype is None:
+                            if func.param_lst[i].opType.eletype is not None:
+                                arg_lst[i].opType.eletype = func.param_lst[i].opType.eletype
+                            else:
+                                raise TypeCannotBeInferred(ast)
+                        else:
+                            if func.param_lst[i].opType.eletype is None:
+                                func.param_lst[i].opType.eletype = arg_lst[i].opType.eletype
+                            else:
+                                if arg_lst[i].opType.eletype != func.param_lst[i].opType.eletype:
+                                    raise TypeMismatchInStatement(ast)
+
                     if arg_lst[i].opType != func.param_lst[i].opType:
                         raise TypeMismatchInStatement(ast)
 
@@ -408,6 +433,7 @@ class StaticChecker(BaseVisitor):
         decl_lst = param
         lhs = ast.lhs.accept(self, decl_lst)
         rhs = ast.rhs.accept(self, decl_lst)
+        # print(lhs.opType, rhs.opType)
 
         # Check type of lhs and rhs:
         if lhs.opType is None and rhs.opType is None:
@@ -420,10 +446,14 @@ class StaticChecker(BaseVisitor):
         if lhs.opType is None and rhs.opType is not None:
             lhs.opType = rhs.opType
 
+        if lhs.opKind == "composite_variable" and rhs.opKind == "composite_variable":
+            if len(lhs.param_lst) != len(rhs.param_lst):
+                raise TypeMismatchInStatement(ast)
+
         if lhs.opType != rhs.opType:
             if isinstance(lhs.opType, ArrayType) and isinstance(rhs.opType, ArrayType):
-                if len(lhs.opType.dimen[0].opName) != len(rhs.opType.dimen[0].opName): 
-                     TypeMismatchInStatement(ast)
+                if len(lhs.param_lst) != len(rhs.param_lst):
+                    raise TypeMismatchInStatement(ast)
             else:
                 raise TypeMismatchInStatement(ast)
             
