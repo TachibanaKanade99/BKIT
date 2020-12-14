@@ -662,11 +662,11 @@ class CheckSuite(unittest.TestCase):
             EndBody.
         Function: main
             Body:
-                Var: a;
-                a = foo(1, 2, "Hmm") + foo1(a);
+                Var: b, a;
+                b = foo(1, 2, "Hmm") + foo1(a);
             EndBody.
         """
-        expect = str(TypeCannotBeInferred(Assign(Id("a"), BinaryOp("+", CallExpr(Id("foo"), [IntLiteral(1), IntLiteral(2), StringLiteral("Hmm")]), CallExpr(Id("foo1"), [Id("a")])))))
+        expect = str(TypeCannotBeInferred(Assign(Id("b"), BinaryOp("+", CallExpr(Id("foo"), [IntLiteral(1), IntLiteral(2), StringLiteral("Hmm")]), CallExpr(Id("foo1"), [Id("a")])))))
         self.assertTrue(TestChecker.test(input, expect, 445))
 
     def test_simple_binary_op_has_type_cannot_inferred(self):
@@ -714,13 +714,12 @@ class CheckSuite(unittest.TestCase):
             Body:
                 Var: foo = 0;
                 foo = foo + foo();
-                c = foo;
                 EndBody.
         Function: foo
             Body:
             EndBody.
         """
-        expect = str(Undeclared(Identifier(), "c"))
+        expect = str(Undeclared(Function(), "foo"))
         self.assertTrue(TestChecker.test(input, expect, 449))
 
     def test_simple_type_mismatch_logical_op(self):
@@ -1151,8 +1150,68 @@ class CheckSuite(unittest.TestCase):
                 a = foo(1)[1];
             EndBody.
         """
-        expect = str(TypeCannotBeInferred(Assign(Id("a"), ArrayCell(CallExpr(Id("foo"),[IntLiteral(1)]),[IntLiteral(1)]))))
+        expect = str(TypeMismatchInExpression(ArrayCell(CallExpr(Id("foo"), [IntLiteral(1)]), [IntLiteral(1)])))
         self.assertTrue(TestChecker.test(input, expect, 482))
+
+    def test_same_variable_name_with_function_name(self):
+        input = """
+        Function: foo
+            Body:
+            EndBody.
+        Function: main
+            Body:
+                Var: foo = 1;
+                foo();
+            EndBody.
+        """
+        expect = str(Undeclared(Function(), "foo"))
+        self.assertTrue(TestChecker.test(input, expect, 483))
+
+    def test_simple_assign_with_two_array_operand(self):
+        input = """
+        Function: main
+            Body:
+                Var: a[10] = {1, 2, 3}, b[1];
+                a[5] = b[1];
+                foo();
+            EndBody.
+        """
+        expect = str(Undeclared(Function(), "foo"))
+        self.assertTrue(TestChecker.test(input, expect, 484))
+
+    def test_simple_array_of_array_lit(self):
+        input = """
+        Function: main
+            Body:
+                Var: a[10] = {{1}, {2}}, b[10];
+                a[10] = b[10];
+            EndBody.
+        """
+        expect = str()
+        self.assertTrue(TestChecker.test(input, expect, 485))
+
+    def test_assign_between_func_call(self):
+        input = """
+        Function: foo
+            Parameter: a
+            Body:
+            EndBody.
+        Function: foo1
+            Parameter: b
+            Body:
+            EndBody. 
+        Function: main
+            Body:
+                Var: a = 10;
+                a = foo(1);
+                foo(1) = foo1(2);
+                foo3();
+            EndBody.
+        """
+        expect = str(Undeclared(Function(), "foo3"))
+        self.assertTrue(TestChecker.test(input, expect, 486))
+
+        
 
     
     

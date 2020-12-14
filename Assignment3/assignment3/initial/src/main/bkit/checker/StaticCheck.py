@@ -109,6 +109,10 @@ class StaticChecker(BaseVisitor):
         var_kind = None
         param_lst = []
 
+        # for array type:
+        dimen = []
+        eletype = None
+
         # Check redeclared variable:
         for decl in decl_lst[0]:
             if var_name == decl.opName:
@@ -119,25 +123,28 @@ class StaticChecker(BaseVisitor):
         # Check dimension:
         if len(var_dimension_lst) > 0:
             var_kind = "composite_variable"
-            param_lst.append(Operand(len(var_dimension_lst), type(var_dimension_lst[0]), "dimension", []))
+            
+            for dimension in var_dimension_lst:
+                dimen.append(Operand(str(dimension), type(dimension), "index", []))
         else:
             var_kind = "scalar_variable"
         
         # Infer type for variable:
         if ast.varInit is not None:
             var_value = ast.varInit.accept(self, decl_lst)
-            
             # array type:
-            # if isinstance(ast.varInit, ArrayLiteral):
-            #     param_lst.append(Operand("elem_type", var_value.opType, "elem", []))
+            if isinstance(var_value.opType, ArrayType):
+                if len(dimen) > 0:
+                    var_type = ArrayType(dimen, var_value.opType.eletype)
+                else:
+                    var_type = ArrayType([], var_value.opType.eletype)
+            else:    
+                var_type = var_value.opType
+        else:
+            if len(var_dimension_lst) > 0:
+                var_type = ArrayType(dimen, None)
 
-            #     # infer array_type:
-            #     if len(var_dimension_lst) > 0 and len(param_lst) == 2:
-            #         var_type = "array_type"
-            # else:
-            var_type = var_value.opType
-
-        # print(var_name, var_type)
+        # print(var_name, var_type.dimen, var_type.eletype)
         return Operand(var_name, var_type, var_kind, param_lst)
 
     def visitFuncDecl(self, ast, param):
@@ -302,26 +309,32 @@ class StaticChecker(BaseVisitor):
         idx_lst = ast.idx
         index_lst = []
 
+        # check if arr is not array cell:
+        if not isinstance(arr.opType, ArrayType):
+            raise TypeMismatchInExpression(ast)
+
         # visit index_lst:
         for x in idx_lst:
             index = x.accept(self, decl_lst)
             index_lst.append(index)
 
-        # check if each index has type is int:
-        for index in index_lst:
-            if index.opType != int:
-                raise TypeMismatchInExpression(ast)
+        # check index number:
+        if len(index_lst) != len(arr.opType.dimen):
+            # print(arr.opType.dimen)
+            raise TypeMismatchInExpression(ast)
+
+        # infer type and check if each index has type is int:
+        for i in range(len(index_lst)):
+            if index_lst[i].opType is None:
+                if arr.opType.dimen[i].opType is not None:     
+                    index_lst[i].opType = arr.opType.dimen[i].opType
+            else:
+                if index_lst[i].opType != arr.opType.dimen[i].opType:
+                    raise TypeMismatchInExpression(ast)
         
-        # infer type:
-
-        if len(arr.param_lst) > 0:
-            if arr.param_lst[0].opKind != "dimension":
-                arr.param_lst = [Operand(None, None, "dimension", [])] + arr.param_lst
-        else:
-            arr.param_lst.append(Operand(None, None, "dimension", []))
-
+        arr.param_lst = index_lst
         # print(arr.opName, arr.opType)
-        return Operand(arr.opName, arr.opType, "array_cell", arr.param_lst)
+        return Operand(arr.opName, arr.opType.eletype, arr.opKind, arr.param_lst)
 
     
     def visitCallExpr(self, ast, param):
@@ -341,16 +354,16 @@ class StaticChecker(BaseVisitor):
         # check type of arguments:
         for i in range(len(arg_lst)):
             if arg_lst[i].opType is None:
-                if func.param_lst[i].opKind != "dimension" and func.param_lst[i].opType is not None:
+                if func.param_lst[i].opType is not None:
                     arg_lst[i].opType = func.param_lst[i].opType
             else:
-                if func.param_lst[i].opKind != "dimension" and func.param_lst[i].opType is None:
+                if func.param_lst[i].opType is None:
                     func.param_lst[i].opType = arg_lst[i].opType
                 else:
                     if arg_lst[i].opType != func.param_lst[i].opType:
                         raise TypeMismatchInExpression(ast)
         
-        func.param_lst = func.param_lst + arg_lst
+        func.param_lst = arg_lst
         return func
 
     def visitCallStmt(self, ast, param):
@@ -380,12 +393,12 @@ class StaticChecker(BaseVisitor):
         # check type of arguments:
         for i in range(len(arg_lst)):
             if arg_lst[i].opType is None:
-                if func.param_lst[i].opKind != "dimension" and func.param_lst[i].opType is None:
+                if func.param_lst[i].opType is None:
                     raise TypeCannotBeInferred(ast)
                 else:
                     arg_lst[i].opType = func.param_lst[i].opType
             else:
-                if func.param_lst[i].opKind != "dimension" and func.param_lst[i].opType is None:
+                if func.param_lst[i].opType is None:
                     func.param_lst[i].opType = arg_lst[i].opType
                 else:
                     if arg_lst[i].opType != func.param_lst[i].opType:
@@ -395,7 +408,6 @@ class StaticChecker(BaseVisitor):
         decl_lst = param
         lhs = ast.lhs.accept(self, decl_lst)
         rhs = ast.rhs.accept(self, decl_lst)
-        # print(lhs.opType, rhs.opType)
 
         # Check type of lhs and rhs:
         if lhs.opType is None and rhs.opType is None:
@@ -409,7 +421,12 @@ class StaticChecker(BaseVisitor):
             lhs.opType = rhs.opType
 
         if lhs.opType != rhs.opType:
-            raise TypeMismatchInStatement(ast)
+            if isinstance(lhs.opType, ArrayType) and isinstance(rhs.opType, ArrayType):
+                if len(lhs.opType.dimen[0].opName) != len(rhs.opType.dimen[0].opName): 
+                     TypeMismatchInStatement(ast)
+            else:
+                raise TypeMismatchInStatement(ast)
+            
         else:
             # Check all type inferred in lhs:
             if len(lhs.param_lst) > 0:
@@ -605,10 +622,9 @@ class StaticChecker(BaseVisitor):
         for decl in flatten_decl_lst:
             if ast.name == decl.opName:
                 if isFunc == "func_call":
-                    if decl.opKind == "function":
-                        return decl
-                else:
-                    return decl
+                    if decl.opKind != "function":
+                        raise Undeclared(Function(), ast.name)            
+                return decl
 
         if isFunc == "func_call":
             raise Undeclared(Function(), ast.name)
@@ -630,15 +646,16 @@ class StaticChecker(BaseVisitor):
 
     def visitArrayLiteral(self, ast, param):
         decl_lst = param
-        elem_type = None
+        dimen = []
+        eletype = None
         lit_lst = []
         
         for x in ast.value:
             lit = x.accept(self, decl_lst)
             lit_lst.append(lit)
-        elem_type = lit_lst[0].opType
+        eletype = lit_lst[0].opType
 
-        return Operand(None, elem_type, "literal", [])
+        return Operand(None, ArrayType(dimen, eletype), "literal", [])
     
 
 
