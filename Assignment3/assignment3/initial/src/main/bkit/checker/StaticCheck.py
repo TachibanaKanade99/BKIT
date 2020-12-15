@@ -371,8 +371,18 @@ class StaticChecker(BaseVisitor):
                 if func.param_lst[i].opType is None:
                     func.param_lst[i].opType = arg_lst[i].opType
                 else:
-                    if arg_lst[i].opType != func.param_lst[i].opType:
-                        raise TypeMismatchInExpression(ast)
+                    if isinstance(arg_lst[i].opType, ArrayType)and isinstance(func.param_lst[i].opType, ArrayType):
+                        if arg_lst[i].opType.eletype is None:
+                            if func.param_lst[i].opType.eletype is not None:
+                                arg_lst[i].opType.eletype = func.param_lst[i].opType.eletype
+                            else:
+                                raise TypeCannotBeInferred(ast)
+                        else:
+                            if func.param_lst[i].opType.eletype is None:
+                                func.param_lst[i].opType.eletype = arg_lst[i].opType.eletype
+                    else:
+                        if arg_lst[i].opType != func.param_lst[i].opType:
+                            raise TypeMismatchInExpression(ast)
         
         func.param_lst = arg_lst + param_lst
         return func
@@ -401,7 +411,7 @@ class StaticChecker(BaseVisitor):
         if len(func.param_lst) != len(arg_lst):
             raise TypeMismatchInStatement(ast)
         
-        print(arg_lst[0].opType, func.param_lst[0].opType)
+        # print(arg_lst[0].opType, func.param_lst[0].opType)
         # check type of arguments:
         for i in range(len(arg_lst)):
             if arg_lst[i].opType is None:
@@ -426,8 +436,9 @@ class StaticChecker(BaseVisitor):
                                 if arg_lst[i].opType.eletype != func.param_lst[i].opType.eletype:
                                     raise TypeMismatchInStatement(ast)
 
-                    if arg_lst[i].opType != func.param_lst[i].opType:
-                        raise TypeMismatchInStatement(ast)
+                    else:
+                        if arg_lst[i].opType != func.param_lst[i].opType:
+                            raise TypeMismatchInStatement(ast)
 
     def visitAssign(self, ast, param):
         decl_lst = param
@@ -624,6 +635,8 @@ class StaticChecker(BaseVisitor):
         if func.opType is not None:
             if func.opType == "void_type" and expr is not None:
                 raise TypeMismatchInStatement(ast)
+            if expr.opType is None:
+                expr.opType = func.opType
             if expr.opType != func.opType:
                 raise TypeMismatchInStatement(ast)
         else:
